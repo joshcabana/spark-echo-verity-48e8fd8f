@@ -56,15 +56,16 @@ const App = () => (
                   <Route path="/" element={<Landing />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/onboarding" element={<Onboarding />} />
-                  <Route path="/lobby" element={<ProtectedRoute><Lobby /></ProtectedRoute>} />
-                  <Route path="/call/:callId" element={<ProtectedRoute><LiveCall /></ProtectedRoute>} />
-                  <Route path="/sparks" element={<ProtectedRoute><SparkHistory /></ProtectedRoute>} />
-                  <Route path="/chat/:sparkId" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
+                  <Route path="/lobby" element={<ProtectedRoute requireTrust><Lobby /></ProtectedRoute>} />
+                  <Route path="/call/:callId" element={<ProtectedRoute requireTrust><LiveCall /></ProtectedRoute>} />
+                  <Route path="/sparks" element={<ProtectedRoute requireTrust><SparkHistory /></ProtectedRoute>} />
+                  <Route path="/chat/:sparkId" element={<ProtectedRoute requireTrust><Chat /></ProtectedRoute>} />
                   <Route path="/tokens" element={<ProtectedRoute><TokenShop /></ProtectedRoute>} />
                   <Route path="/admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
                   <Route path="/transparency" element={<Transparency />} />
                   <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                   <Route path="/appeal" element={<ProtectedRoute><Appeal /></ProtectedRoute>} />
+                  <Route path="/appeal/:flagId" element={<ProtectedRoute><Appeal /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>

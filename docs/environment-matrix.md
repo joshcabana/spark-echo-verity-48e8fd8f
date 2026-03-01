@@ -20,11 +20,13 @@ This document is the canonical source of truth for project targeting. If any fil
 
 ## Runtime Policy
 
-- Strict mode: `VITE_REQUIRE_PHONE_VERIFICATION=true`
-- Temporary incident fallback only: `VITE_REQUIRE_PHONE_VERIFICATION=false`
+- Policy storage: `public.app_config` row `key='auth_policy'`
+- Flag key: `value_json.require_phone_verification`
+- Policy API: `supabase/functions/get-feature-flags`
 - Optional social login enforcement: `VITE_REQUIRE_GOOGLE_AUTH=true`
 
-Fallback mode is allowed only while phone OTP provider is unavailable. Re-enable strict mode as soon as provider health is restored.
+Fallback mode (`require_phone_verification=false`) is allowed only while phone OTP provider is unavailable.
+Re-enable strict mode (`require_phone_verification=true`) as soon as provider health is restored.
 
 ## Manual Verification Commands
 
@@ -38,6 +40,7 @@ Expected strict mode result:
 - `disable_signup=false`
 - `external.email=true`
 - `external.phone=true`
+- `feature_flags.require_phone_verification=true`
 
 ## Historical Notes
 

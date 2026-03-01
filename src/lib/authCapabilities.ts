@@ -16,14 +16,6 @@ interface AuthSettingsResponse {
   };
 }
 
-export const parseRequirePhoneVerification = (rawValue: string | undefined): boolean => {
-  return (rawValue ?? "true").toLowerCase() !== "false";
-};
-
-export const requirePhoneVerification = (): boolean => {
-  return parseRequirePhoneVerification(import.meta.env.VITE_REQUIRE_PHONE_VERIFICATION);
-};
-
 export const mapAuthSettingsToCapabilities = (settings: AuthSettingsResponse): AuthCapabilities => {
   return {
     disableSignup: settings.disable_signup ?? true,

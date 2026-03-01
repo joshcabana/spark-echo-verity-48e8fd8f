@@ -43,21 +43,25 @@ npm run check:auth-settings
 Expected:
 - `disable_signup=false`
 - `external.email=true`
-- `external.phone=true` when `VITE_REQUIRE_PHONE_VERIFICATION=true`
+- `external.phone=true` when `feature_flags.require_phone_verification=true`
 - `external.google=true` when `VITE_REQUIRE_GOOGLE_AUTH=true`
 
 ## 4) Fallback Policy
 
-Default strict mode:
+Default strict mode (DB-controlled):
 
-```env
-VITE_REQUIRE_PHONE_VERIFICATION=true
+```sql
+update public.app_config
+set value_json = jsonb_set(value_json, '{require_phone_verification}', 'true'::jsonb, true)
+where key = 'auth_policy';
 ```
 
 Temporary incident mode (only if SMS provider is down):
 
-```env
-VITE_REQUIRE_PHONE_VERIFICATION=false
+```sql
+update public.app_config
+set value_json = jsonb_set(value_json, '{require_phone_verification}', 'false'::jsonb, true)
+where key = 'auth_policy';
 ```
 
 When fallback mode is active:

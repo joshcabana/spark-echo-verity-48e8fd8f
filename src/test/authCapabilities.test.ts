@@ -1,13 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { mapAuthSettingsToCapabilities, parseRequirePhoneVerification } from "@/lib/authCapabilities";
+import { mapAuthSettingsToCapabilities } from "@/lib/authCapabilities";
 
 describe("auth capabilities helpers", () => {
-  it("treats phone verification as required by default", () => {
-    expect(parseRequirePhoneVerification(undefined)).toBe(true);
-    expect(parseRequirePhoneVerification("true")).toBe(true);
-    expect(parseRequirePhoneVerification("false")).toBe(false);
-  });
-
   it("maps auth settings response into stable capability flags", () => {
     const capabilities = mapAuthSettingsToCapabilities({
       disable_signup: false,
@@ -15,6 +9,7 @@ describe("auth capabilities helpers", () => {
       external: {
         email: true,
         phone: false,
+        google: false,
       },
     });
 

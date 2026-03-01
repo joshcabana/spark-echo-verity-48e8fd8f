@@ -46,9 +46,6 @@ read_env_var() {
 
 SUPA_URL="$(read_env_var "VITE_SUPABASE_URL")"
 ANON_KEY="$(read_env_var "VITE_SUPABASE_PUBLISHABLE_KEY")"
-REQUIRE_PHONE_FLAG="$(read_env_var "VITE_REQUIRE_PHONE_VERIFICATION")"
-REQUIRE_PHONE="${REQUIRE_PHONE_FLAG:-true}"
-REQUIRE_PHONE_LOWER="$(echo "$REQUIRE_PHONE" | tr '[:upper:]' '[:lower:]')"
 REQUIRE_GOOGLE_FLAG="$(read_env_var "VITE_REQUIRE_GOOGLE_AUTH")"
 REQUIRE_GOOGLE="${REQUIRE_GOOGLE_FLAG:-false}"
 REQUIRE_GOOGLE_LOWER="$(echo "$REQUIRE_GOOGLE" | tr '[:upper:]' '[:lower:]')"
@@ -64,7 +61,32 @@ SETTINGS_JSON="$(
     -H "Authorization: Bearer $ANON_KEY"
 )"
 
+FLAGS_RESPONSE="$(
+  curl -sS -w '\n%{http_code}' "$SUPA_URL/functions/v1/get-feature-flags" \
+    -H "apikey: $ANON_KEY" \
+    -H "Authorization: Bearer $ANON_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{}'
+)"
+
+FLAGS_STATUS="$(echo "$FLAGS_RESPONSE" | tail -n 1)"
+FLAGS_BODY="$(echo "$FLAGS_RESPONSE" | sed '$d')"
+
+if [[ "$FLAGS_STATUS" != "200" ]]; then
+  echo "FAIL: get-feature-flags returned HTTP $FLAGS_STATUS." >&2
+  echo "$FLAGS_BODY" >&2
+  exit 2
+fi
+
+REQUIRE_PHONE_JSON="$(echo "$FLAGS_BODY" | jq -r '.require_phone_verification')"
+if [[ "$REQUIRE_PHONE_JSON" != "true" && "$REQUIRE_PHONE_JSON" != "false" ]]; then
+  echo "FAIL: get-feature-flags response is invalid (require_phone_verification must be boolean)." >&2
+  echo "$FLAGS_BODY" >&2
+  exit 2
+fi
+
 echo "$SETTINGS_JSON" | jq '{disable_signup, mailer_autoconfirm, external:{email:.external.email, phone:.external.phone, google:.external.google}}'
+echo "$FLAGS_BODY" | jq '{feature_flags:{require_phone_verification:.require_phone_verification}}'
 
 DISABLE_SIGNUP="$(echo "$SETTINGS_JSON" | jq -r '.disable_signup')"
 EMAIL_ENABLED="$(echo "$SETTINGS_JSON" | jq -r '.external.email')"
@@ -81,12 +103,12 @@ if [[ "$EMAIL_ENABLED" != "true" ]]; then
   exit 2
 fi
 
-if [[ "$REQUIRE_PHONE_LOWER" == "true" && "$PHONE_ENABLED" != "true" ]]; then
-  echo "FAIL: external.phone must be true while VITE_REQUIRE_PHONE_VERIFICATION=true." >&2
+if [[ "$REQUIRE_PHONE_JSON" == "true" && "$PHONE_ENABLED" != "true" ]]; then
+  echo "FAIL: external.phone must be true while require_phone_verification=true." >&2
   exit 2
 fi
 
-if [[ "$REQUIRE_PHONE_LOWER" != "true" && "$PHONE_ENABLED" != "true" ]]; then
+if [[ "$REQUIRE_PHONE_JSON" != "true" && "$PHONE_ENABLED" != "true" ]]; then
   echo "WARN: phone provider is disabled and fallback mode is active." >&2
 fi
 

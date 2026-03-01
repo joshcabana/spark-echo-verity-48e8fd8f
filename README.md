@@ -144,7 +144,7 @@ npm run check:no-hardcoded-supabase
 
 - Canonical Supabase project: `itdzdyhdkbcxbqgukzis`
 - Canonical source-of-truth matrix: [docs/environment-matrix.md](docs/environment-matrix.md)
-- Strict mode default: `VITE_REQUIRE_PHONE_VERIFICATION=true`
-- Temporary incident fallback: set `VITE_REQUIRE_PHONE_VERIFICATION=false` and redeploy
+- Runtime policy source: `public.app_config` row `key='auth_policy'`
+- Phone verification mode: `value_json.require_phone_verification` (served via `get-feature-flags`)
 - Optional Google login enforcement: `VITE_REQUIRE_GOOGLE_AUTH=true`
 - Full runbook: [docs/auth-unblock-runbook.md](docs/auth-unblock-runbook.md)

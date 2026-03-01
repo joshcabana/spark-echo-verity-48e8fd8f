@@ -815,6 +815,24 @@ export type Database = {
         Args: { _spark_id: string; _user_id: string }
         Returns: boolean
       }
+      submit_call_decision: {
+        Args: {
+          p_call_id: string
+          p_decision: Database["public"]["Enums"]["spark_decision"]
+        }
+        Returns: Database["public"]["Tables"]["calls"]["Row"]
+      }
+      update_my_profile: {
+        Args: {
+          p_avatar_url?: string | null
+          p_bio?: string | null
+          p_city?: string | null
+          p_display_name?: string | null
+          p_gender?: string | null
+          p_handle?: string | null
+        }
+        Returns: Database["public"]["Tables"]["profiles"]["Row"]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

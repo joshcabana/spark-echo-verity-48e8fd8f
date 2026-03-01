@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthCapabilities } from "@/hooks/useAuthCapabilities";
-import { requirePhoneVerification } from "@/lib/authCapabilities";
+import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import DropCard from "@/components/lobby/DropCard";
 import DropsFilter, { type FilterOption } from "@/components/lobby/DropsFilter";
 import MatchmakingOverlay from "@/components/lobby/MatchmakingOverlay";
@@ -33,7 +33,8 @@ const Lobby = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { data: authCapabilities } = useAuthCapabilities();
-  const requirePhoneVerificationEnabled = requirePhoneVerification();
+  const { data: featureFlags } = useFeatureFlags();
+  const requirePhoneVerificationEnabled = featureFlags?.requirePhoneVerification ?? true;
   const [filter, setFilter] = useState<FilterOption>("all");
   const [matchmaking, setMatchmaking] = useState<{
     active: boolean;

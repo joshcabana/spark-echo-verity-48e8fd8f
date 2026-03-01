@@ -6,7 +6,7 @@ import { ArrowRight, Phone, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthCapabilities } from "@/hooks/useAuthCapabilities";
-import { requirePhoneVerification } from "@/lib/authCapabilities";
+import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 
 interface PhoneVerifyStepProps {
   onNext: (verified: boolean) => void;
@@ -19,7 +19,8 @@ const PhoneVerifyStep = ({ onNext }: PhoneVerifyStepProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { data: authCapabilities, refetch: refetchAuthCapabilities, isFetching: checkingAuthCapabilities } = useAuthCapabilities();
-  const requirePhoneVerificationEnabled = requirePhoneVerification();
+  const { data: featureFlags } = useFeatureFlags();
+  const requirePhoneVerificationEnabled = featureFlags?.requirePhoneVerification ?? true;
   const phoneProviderUnavailable = authCapabilities?.phoneEnabled === false;
   const allowFallbackContinue = phoneProviderUnavailable && !requirePhoneVerificationEnabled;
   const blockInStrictMode = phoneProviderUnavailable && requirePhoneVerificationEnabled;
