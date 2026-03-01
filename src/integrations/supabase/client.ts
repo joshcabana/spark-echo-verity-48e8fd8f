@@ -2,13 +2,34 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const PROD_HOSTS = ['getverity.com.au', 'www.getverity.com.au'];
+const isProdHost = typeof window !== 'undefined' && PROD_HOSTS.includes(window.location.hostname);
+
+const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL ||
+  (isProdHost ? 'https://itdzdyhdkbcxbqgukzis.supabase.co' : '');
+
+const SUPABASE_PUBLISHABLE_KEY =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  (isProdHost
+    ? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZHpkeWhka2JjeGJxZ3VremlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIxMDA5MTcsImV4cCI6MjA4NzY3NjkxN30.06IYR1KfgqKb9kgiWJQYmEEti5Sts0HaBvEgTooSlho'
+    : '');
+
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  console.error(
+    '[Verity] Supabase env vars missing (VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY). ' +
+    'Backend features will not work until configured.'
+  );
+}
+
+// Use inert placeholders to prevent createClient from throwing
+const safeUrl = SUPABASE_URL || 'https://placeholder.supabase.co';
+const safeKey = SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MjAwMDAwMDAwMH0.aW52YWxpZC1wbGFjZWhvbGRlci1zaWduYXR1cmU';
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+export const supabase = createClient<Database>(safeUrl, safeKey, {
   auth: {
     storage: localStorage,
     persistSession: true,
