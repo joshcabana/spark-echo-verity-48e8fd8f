@@ -96,6 +96,13 @@ Interpretation:
 - Production is now serving the latest deployed bundle.
 - Prior stale-hash/preload issue is resolved.
 
+Route availability smoke check:
+- `/` -> `200`
+- `/auth` -> `200`
+- `/onboarding` -> `200`
+- `/lobby` -> `200`
+- `/tokens` -> `200`
+
 ## Access and Operational Blockers (Observed)
 
 ### Supabase project role blocker
