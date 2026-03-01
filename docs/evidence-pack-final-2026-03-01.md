@@ -109,6 +109,9 @@ Route availability smoke check:
 - Browser automation reached `https://supabase.com/dashboard/project/itdzdyhdkbcxbqgukzis/auth/providers`.
 - `Authentication`, `Database`, `Storage` sections are disabled in current session.
 - Therefore SMTP/Twilio/provider updates cannot be performed from this session.
+- Supabase CLI confirmation:
+  - `npx -y supabase projects list` shows only `gnyvtbuujdxbcatjydgk` and `nhpbxlvogqnqutmflwlk`.
+  - `npx -y supabase link --project-ref itdzdyhdkbcxbqgukzis` fails with platform access-control privileges error.
 
 ### Hosting deploy blocker
 - Resolved in this run.
