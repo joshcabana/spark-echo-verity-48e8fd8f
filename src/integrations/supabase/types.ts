@@ -10,32 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.4"
-  }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
+    PostgrestVersion: "14.1"
   }
   public: {
     Tables: {
@@ -48,7 +23,7 @@ export type Database = {
         Insert: {
           key: string
           updated_at?: string
-          value_json: Json
+          value_json?: Json
         }
         Update: {
           key?: string
@@ -870,27 +845,7 @@ export type Database = {
           p_call_id: string
           p_decision: Database["public"]["Enums"]["spark_decision"]
         }
-        Returns: {
-          agora_channel: string | null
-          callee_decision: Database["public"]["Enums"]["spark_decision"] | null
-          callee_id: string
-          caller_decision: Database["public"]["Enums"]["spark_decision"] | null
-          caller_id: string
-          created_at: string
-          duration_seconds: number | null
-          ended_at: string | null
-          id: string
-          is_mutual_spark: boolean | null
-          room_id: string | null
-          started_at: string | null
-          status: Database["public"]["Enums"]["call_status"] | null
-        }
-        SetofOptions: {
-          from: "*"
-          to: "calls"
-          isOneToOne: true
-          isSetofReturn: false
-        }
+        Returns: undefined
       }
       update_my_profile: {
         Args: {
@@ -901,33 +856,7 @@ export type Database = {
           p_gender?: string
           p_handle?: string
         }
-        Returns: {
-          age: number | null
-          avatar_url: string | null
-          bio: string | null
-          city: string | null
-          created_at: string
-          display_name: string | null
-          gender: string | null
-          handle: string | null
-          id: string
-          is_active: boolean | null
-          stripe_customer_id: string | null
-          subscription_expires_at: string | null
-          subscription_tier:
-            | Database["public"]["Enums"]["subscription_tier"]
-            | null
-          token_balance: number
-          updated_at: string
-          user_id: string
-          verification_status: string | null
-        }
-        SetofOptions: {
-          from: "*"
-          to: "profiles"
-          isOneToOne: true
-          isSetofReturn: false
-        }
+        Returns: undefined
       }
     }
     Enums: {
@@ -1062,9 +991,6 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
