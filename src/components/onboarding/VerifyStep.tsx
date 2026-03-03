@@ -5,10 +5,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
   Shield, Phone, Camera, Check, ArrowRight, ShieldCheck,
-  CheckCircle, Sparkles, Calendar,
+  CheckCircle, Sparkles, Calendar, UserPlus,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import { useAuthCapabilities } from "@/hooks/useAuthCapabilities";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +32,7 @@ type SubStep = "pledge" | "phone" | "selfie" | "done";
 const VerifyStep = ({ onComplete }: VerifyStepProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { data: featureFlags } = useFeatureFlags();
   const { data: authCapabilities } = useAuthCapabilities();
 
@@ -381,6 +383,16 @@ const VerifyStep = ({ onComplete }: VerifyStepProps) => {
                 </p>
               </div>
             )}
+
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate(`/drops/friendfluence${nextDrop ? `?drop=${nextDrop.id}` : ""}`)}
+              className="w-full"
+            >
+              <UserPlus className="mr-2 h-4 w-4" />
+              Bring a Friend to this Drop
+            </Button>
 
             <Button variant="gold" size="lg" onClick={finishVerification} className="w-full group">
               <Sparkles className="mr-2 h-4 w-4" />

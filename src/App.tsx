@@ -24,6 +24,7 @@ const Admin = lazy(() => import("./pages/Admin"));
 const Transparency = lazy(() => import("./pages/Transparency"));
 const Appeal = lazy(() => import("./pages/Appeal"));
 const Profile = lazy(() => import("./pages/Profile"));
+const Friendfluence = lazy(() => import("./pages/Friendfluence"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -66,6 +67,7 @@ const App = () => (
                   <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                   <Route path="/appeal" element={<ProtectedRoute><Appeal /></ProtectedRoute>} />
                   <Route path="/appeal/:flagId" element={<ProtectedRoute><Appeal /></ProtectedRoute>} />
+                  <Route path="/drops/friendfluence" element={<ProtectedRoute><Friendfluence /></ProtectedRoute>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>

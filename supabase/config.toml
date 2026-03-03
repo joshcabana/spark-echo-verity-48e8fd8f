@@ -2,3 +2,6 @@ project_id = "lixgbpgemcpdbjzhjknf"
 
 [functions.agora-demo-token]
 verify_jwt = false
+
+[functions.generate-friend-invite]
+verify_jwt = false
