@@ -1,4 +1,3 @@
-import { forwardRef } from "react";
 import { motion } from "framer-motion";
 import { Video, ShieldCheck, Brain, Compass, Calendar, Users } from "lucide-react";
 
@@ -41,9 +40,9 @@ const features = [
   },
 ];
 
-const FeaturesSection = forwardRef<HTMLElement>((_, ref) => {
+const FeaturesSection = () => {
   return (
-    <section ref={ref} id="how-it-works" className="py-24 md:py-32">
+    <section id="how-it-works" className="py-24 md:py-32">
       <div className="container max-w-6xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -85,8 +84,6 @@ const FeaturesSection = forwardRef<HTMLElement>((_, ref) => {
       </div>
     </section>
   );
-});
-
-FeaturesSection.displayName = "FeaturesSection";
+};
 
 export default FeaturesSection;

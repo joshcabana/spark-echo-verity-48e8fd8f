@@ -1,4 +1,3 @@
-import { forwardRef } from "react";
 import { Link } from "react-router-dom";
 
 interface VerityLogoProps {
@@ -15,11 +14,11 @@ interface VerityLogoProps {
  *   White     #F3F3F3  (dark-mode V + text)
  *   Gold      #D4AF37  (spark accent — always)
  */
-const VerityLogo = forwardRef<HTMLAnchorElement | SVGSVGElement, VerityLogoProps>(({
+const VerityLogo = ({
   variant = "full",
   className = "",
   linkTo = "/",
-}, _ref) => {
+}: VerityLogoProps) => {
   /* Shared SVG defs: golden glow filter for dark mode */
   const defs = (
     <defs>
@@ -118,8 +117,6 @@ const VerityLogo = forwardRef<HTMLAnchorElement | SVGSVGElement, VerityLogoProps
   ) : (
     full
   );
-});
-
-VerityLogo.displayName = "VerityLogo";
+};
 
 export default VerityLogo;

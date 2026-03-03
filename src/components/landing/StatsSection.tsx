@@ -1,4 +1,3 @@
-import { forwardRef } from "react";
 import { motion } from "framer-motion";
 
 const stats = [
@@ -14,9 +13,9 @@ const causes = [
   { pct: "24%", label: "Repetitive conversations" },
 ];
 
-const StatsSection = forwardRef<HTMLElement>((_, ref) => {
+const StatsSection = () => {
   return (
-    <section ref={ref} className="py-24 md:py-32 bg-secondary/30">
+    <section className="py-24 md:py-32 bg-secondary/30">
       <div className="container max-w-5xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -81,8 +80,6 @@ const StatsSection = forwardRef<HTMLElement>((_, ref) => {
       </div>
     </section>
   );
-});
-
-StatsSection.displayName = "StatsSection";
+};
 
 export default StatsSection;
