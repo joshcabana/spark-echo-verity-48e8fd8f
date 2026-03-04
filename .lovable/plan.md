@@ -1,152 +1,75 @@
 
 
-## Phase 2: Public Marketing Pages, SEO Schemas, Hero/Navbar Updates, Sitemap
+## Phase 3: Green Room, Settings Page, Route Prefix Evaluation
 
-### Overview
-Create 6 new public pages, update landing page hero with spec-aligned headline and trust chips, expand navbar and footer with new links, add SEO schemas (FAQPage, Organization), and generate sitemap.xml. No Agora/Stripe imports on any public page.
+### Route Prefix Decision: Keep Flat Routes
 
----
-
-### 1. New Pages (6 files to create)
-
-**`src/pages/HowItWorks.tsx`** — Standalone full-page version
-- Reuses the same 4-step content from `HowItWorksSection.tsx` but as a dedicated page with back nav, Helmet SEO tags, and expanded descriptions
-- Adds a "Get verified" CTA at bottom
-- Visual: vertical timeline layout with step cards
-
-**`src/pages/Safety.tsx`** — Safety Promise page
-- Heading: "Built for safety — not virality."
-- Sections: No recordings ever, Mutual consent reveal, 18+ verification required, AI moderation with human appeal, One-tap exit + report, Zero tolerance policy, Guardian Net safety sharing
-- Link to `/transparency` for live stats
-- Link to `/privacy` for data details
-
-**`src/pages/Terms.tsx`** — Terms of Service
-- Standard ToS sections: Eligibility (18+), Account, Acceptable Use, Privacy, Intellectual Property, Limitation of Liability, Termination, Governing Law (Australia), Contact
-- Last updated: March 2026
-
-**`src/pages/FAQ.tsx`** — FAQ with FAQPage JSON-LD
-- 7 questions from spec: Is it anonymous if it's video? Is anything recorded? How does Spark work? How do you verify 18+? What data do you keep? How do you handle bad actors? Can I delete my data?
-- Uses shadcn Accordion component
-- Injects `<script type="application/ld+json">` FAQPage schema via react-helmet
-
-**`src/pages/Drops.tsx`** — Public Drops schedule (read-only)
-- Shows themed Drop rooms from `src/data/rooms.ts` with peak hours and descriptions
-- "RSVP" CTAs link to `/auth`
-- No auth required to view
-- Helmet with unique title/description
-
-**`src/pages/Pricing.tsx`** — Free vs Verity Pass comparison
-- Two-tier card layout: Free (Drops, Spark/Pass, basic chat) vs Verity Pass (Spark Reflection AI, Chemistry Vault, priority RSVP, advanced safety)
-- "Cancel anytime" copy
-- CTA links to `/auth`
-- No Stripe imports (just static pricing page; checkout happens post-auth)
+Migrating to `/app/*` prefix would break existing links, bookmarks, the route test file, BottomNav paths, Lobby/LiveCall navigate calls, push notification URLs, and realtime callback URLs throughout the codebase. The benefit is purely cosmetic. **Decision: keep flat routes.** Add the two new pages at `/green-room` and `/settings`.
 
 ---
 
-### 2. Hero Section Updates (`HeroSection.tsx`)
+### 1. Green Room Page (`/green-room`)
 
-- Update H1 to spec: "Anonymous 45-second video dates. Reveal only with mutual Spark."
-- Update subhead: "Verified 18+. No profiles. No swiping. Just eyes + voice for 45 seconds — then you both choose: Spark or walk. Dignity either way."
-- Primary CTA: "RSVP for the next Drop" → `/auth`
-- Secondary CTA: "How it works" → `/how-it-works`
-- Add trust chips row above fold (inline badges): "18+ verified" · "No video stored" · "Mutual consent reveal" · "One-tap exit + report" · "Scheduled Drops (no infinite scroll)"
+Pre-call hardware check page. User navigates here before entering the Lobby (or as a pre-flight before joining a Drop).
 
----
+**Create `src/pages/GreenRoom.tsx`:**
+- Camera preview using `getUserMedia` (no Agora import — just native browser API)
+- Mic level meter via `AudioContext` + `AnalyserNode` (real-time volume bar)
+- Network quality indicator (simple `navigator.connection` check + fetch latency test to Supabase)
+- Lighting tips text ("Find good lighting, face a window")
+- "Anonymous filter ON (required pre-Spark)" indicator badge
+- "You can leave anytime" reassurance copy
+- "Enter Lobby" CTA button → navigates to `/lobby`
+- Optional: Guardian Net quick-add (link to `/drops/friendfluence`)
+- Uses Helmet for SEO title
+- BottomNav at bottom
+- Clean up `getUserMedia` stream on unmount
 
-### 3. Navbar Updates (`Navbar.tsx`)
+**Route:** Protected (requires auth but not requireTrust — users should be able to test hardware before completing verification).
 
-Replace current links with spec nav:
-- Links: How it works (`/how-it-works`), Drops (`/drops`), Safety (`/safety`), Pricing (`/pricing`)
-- Primary CTA button: "RSVP for the next Drop" → `/auth`
-- Secondary: "Sign in" text link → `/auth`
-- Remove ThemeToggle from nav (keep dark theme default)
-- Add mobile hamburger menu for the expanded nav
+### 2. Settings Page (`/settings`)
 
----
+Account management, data deletion, subscription management.
 
-### 4. Landing Page — New Trust/Safety Section
+**Create `src/pages/Settings.tsx`:**
+- Header: "Settings"
+- Sections:
+  - **Account**: Email display, link to Profile for name/avatar editing
+  - **Subscription**: Current tier display + "Manage subscription" button (reuse customer-portal invoke from Profile.tsx)
+  - **Privacy & Data**: 
+    - "Download my data" button (shows toast "Coming soon" for now)
+    - "Delete my account" button with confirmation dialog (re-auth via password prompt, then calls `supabase.rpc('delete_my_account')` — we'll need to note this RPC doesn't exist yet, so show a toast explaining the request has been submitted)
+  - **Legal**: Links to Privacy, Terms, Safety pages
+  - **App**: Sign out button
+- BottomNav with "profile" active tab
+- Helmet SEO
 
-**Create `src/components/landing/TrustSection.tsx`**
-- Heading: "Built for safety — not virality."
-- Bullet list: no recordings, mutual consent reveal, verification required, report/exit, zero tolerance
-- CTA button: "Read the Safety Promise" → `/safety`
-- Insert between InnovationsSection and CTASection in `Landing.tsx`
+**Route:** Protected (auth required, no requireTrust).
 
----
+### 3. Route + Nav Updates
 
-### 5. Footer Updates (`Footer.tsx`)
+**`src/App.tsx`:**
+- Add lazy imports for GreenRoom and Settings
+- Add routes: `/green-room` (ProtectedRoute) and `/settings` (ProtectedRoute)
 
-Add new links to the footer nav:
-- How it works, Safety, Terms, FAQ, Pricing, Drops
-- Keep existing: About, Transparency, Privacy
-- Keep trust signals line
+**`src/components/BottomNav.tsx`:**
+- Change "Profile" tab path from `/profile` to `/settings` (settings is the standard destination; profile is accessible from within settings)
+- Keep other tabs unchanged
 
----
-
-### 6. Route Registration (`App.tsx`)
-
-Add 6 new lazy-loaded routes (all public, no ProtectedRoute wrapper):
-```
-/how-it-works → HowItWorks
-/safety → Safety
-/terms → Terms
-/faq → FAQ
-/drops → Drops
-/pricing → Pricing
-```
-
----
-
-### 7. SEO — Organization JSON-LD (`index.html`)
-
-Add Organization schema alongside existing WebApplication schema:
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Verity",
-  "url": "https://getverity.com.au",
-  "logo": "https://getverity.com.au/og-logo.png",
-  "sameAs": [],
-  "contactPoint": {
-    "@type": "ContactPoint",
-    "email": "privacy@getverity.com.au",
-    "contactType": "customer support"
-  }
-}
-```
+**`src/pages/Lobby.tsx`:**
+- Add a "Green Room" banner/link at the top for first-time users or as a persistent "Check your setup" link before joining a Drop
 
 ---
 
-### 8. Sitemap (`public/sitemap.xml`)
+### Files to create (2)
+- `src/pages/GreenRoom.tsx`
+- `src/pages/Settings.tsx`
 
-Static sitemap listing all public routes:
-```
-/ /about /how-it-works /safety /privacy /terms /faq /drops /pricing /transparency
-```
-
-Update `robots.txt` to reference sitemap.
-
----
-
-### Files to create (8)
-- `src/pages/HowItWorks.tsx`
-- `src/pages/Safety.tsx`
-- `src/pages/Terms.tsx`
-- `src/pages/FAQ.tsx`
-- `src/pages/Drops.tsx`
-- `src/pages/Pricing.tsx`
-- `src/components/landing/TrustSection.tsx`
-- `public/sitemap.xml`
-
-### Files to edit (6)
-- `src/components/landing/HeroSection.tsx` — new headline, trust chips
-- `src/components/landing/Navbar.tsx` — expanded nav + mobile menu
-- `src/components/landing/Footer.tsx` — new links
-- `src/pages/Landing.tsx` — add TrustSection
-- `src/App.tsx` — 6 new routes
-- `index.html` — Organization JSON-LD
-- `public/robots.txt` — sitemap reference
+### Files to edit (3)
+- `src/App.tsx` — 2 new lazy imports + 2 new routes
+- `src/components/BottomNav.tsx` — update Profile tab to `/settings`
+- `src/pages/Lobby.tsx` — add Green Room link in header area
 
 ### No DB migrations needed.
+No new edge functions needed. The "delete account" action will show a confirmation toast directing user to contact support until a proper RPC is built in a later phase.
 
