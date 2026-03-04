@@ -132,6 +132,7 @@ const navItems: { id: AdminSection; label: string; icon: React.ElementType }[] =
   { id: "moderation", label: "Moderation", icon: Shield },
   { id: "appeals", label: "Appeals", icon: MessageSquare },
   { id: "guardian", label: "Guardian", icon: AlertTriangle },
+  { id: "drops", label: "Drops", icon: Calendar },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "pilot", label: "Pilot", icon: TrendingUp },
   { id: "users", label: "Users", icon: Users },
