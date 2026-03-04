@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import SparkCard from "@/components/sparks/SparkCard";
 import SparkEmptyState from "@/components/sparks/SparkEmptyState";
+import SparkCardSkeleton from "@/components/sparks/SparkCardSkeleton";
 import BottomNav from "@/components/BottomNav";
 import ReplayVault from "@/components/vault/ReplayVault";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -32,7 +33,7 @@ const SparkHistory = () => {
   const { user } = useAuth();
   const [active, setActive] = useState<Filter>("All");
 
-  const { data: sparks = [] } = useQuery<SparkWithPartner[]>({
+  const { data: sparks = [], isLoading: sparksLoading } = useQuery<SparkWithPartner[]>({
     queryKey: ["sparks", user?.id],
     queryFn: async () => {
       if (!user) return [];
@@ -142,7 +143,11 @@ const SparkHistory = () => {
                 </button>
               ))}
             </div>
-            {filtered.length === 0 ? (
+            {sparksLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 4 }).map((_, i) => <SparkCardSkeleton key={i} />)}
+              </div>
+            ) : filtered.length === 0 ? (
               <SparkEmptyState />
             ) : (
               <div className="space-y-3">

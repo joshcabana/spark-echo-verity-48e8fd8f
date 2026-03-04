@@ -9,6 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthCapabilities } from "@/hooks/useAuthCapabilities";
 import { useFeatureFlags } from "@/hooks/useFeatureFlags";
 import DropCard from "@/components/lobby/DropCard";
+import DropCardSkeleton from "@/components/lobby/DropCardSkeleton";
 import DropsFilter, { type FilterOption } from "@/components/lobby/DropsFilter";
 import MatchmakingOverlay from "@/components/lobby/MatchmakingOverlay";
 import BottomNav from "@/components/BottomNav";
@@ -53,7 +54,7 @@ const Lobby = () => {
   );
 
   // Fetch drops
-  const { data: drops = [] } = useQuery<Drop[]>({
+  const { data: drops = [], isLoading: dropsLoading } = useQuery<Drop[]>({
     queryKey: ["drops"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -335,28 +336,33 @@ const Lobby = () => {
         )}
 
         <div className="space-y-4">
-          {filtered.map((drop, i) => (
-            <DropCard
-              key={drop.id}
-              drop={drop}
-              rsvpCount={(rsvpCounts as Record<string, number>)[drop.id] ?? 0}
-              isRsvpd={rsvps.includes(drop.id)}
-              onRsvp={(id) => rsvpMutation.mutate(id)}
-              onCancel={(id) => cancelMutation.mutate(id)}
-              onJoin={handleJoin}
-              trustComplete={trustComplete}
-              index={i}
-              waitingCount={(waitingCounts as Record<string, number>)[drop.id] ?? 0}
-            />
-          ))}
+          {dropsLoading ? (
+            Array.from({ length: 3 }).map((_, i) => <DropCardSkeleton key={i} />)
+          ) : filtered.length === 0 ? (
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+              className="text-center text-muted-foreground py-16 text-sm">
+              {filter === "my-rsvps" ? "You haven't RSVP'd to any Drops yet." : "No Drops scheduled — check back soon."}
+            </motion.p>
+          ) : (
+            filtered.map((drop, i) => (
+              <DropCard
+                key={drop.id}
+                drop={drop}
+                rsvpCount={(rsvpCounts as Record<string, number>)[drop.id] ?? 0}
+                isRsvpd={rsvps.includes(drop.id)}
+                onRsvp={(id) => rsvpMutation.mutate(id)}
+                onCancel={(id) => cancelMutation.mutate(id)}
+                onJoin={handleJoin}
+                trustComplete={trustComplete}
+                index={i}
+                waitingCount={(waitingCounts as Record<string, number>)[drop.id] ?? 0}
+              />
+            ))
+          )}
         </div>
 
-        {filtered.length === 0 && (
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="text-center text-muted-foreground py-16 text-sm">
-            {filter === "my-rsvps" ? "You haven't RSVP'd to any Drops yet." : "No Drops scheduled — check back soon."}
-          </motion.p>
-        )}
+
+
 
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.8 }}
           className="mt-10 mb-6 text-center text-[11px] text-muted-foreground/40 leading-relaxed">
