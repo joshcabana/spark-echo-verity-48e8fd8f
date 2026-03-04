@@ -207,7 +207,7 @@ const LiveCall = () => {
       setElapsed((e) => e + 1);
     }, 1000);
     return () => clearInterval(t);
-  }, [phase, secondsLeft]);
+  }, [phase, secondsLeft, callId, channelFromUrl]);
 
   // Capture live speech transcript when browser speech APIs are available.
   useEffect(() => {

@@ -1,5 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import ReplayCard from "./ReplayCard";
@@ -40,7 +41,7 @@ const ReplayVault = () => {
       if (error) throw error;
 
       // Fetch partner names
-      const partnerIds = (data || []).map((r: any) =>
+      const partnerIds = (data || []).map((r: Tables<"chemistry_replays">) =>
         r.user_a === user.id ? r.user_b : r.user_a
       );
       const uniqueIds = [...new Set(partnerIds)];
@@ -61,7 +62,7 @@ const ReplayVault = () => {
         });
       }
 
-      return (data || []).map((r: any) => {
+      return (data || []).map((r: Tables<"chemistry_replays">) => {
         const partnerId = r.user_a === user.id ? r.user_b : r.user_a;
         return {
           ...r,
