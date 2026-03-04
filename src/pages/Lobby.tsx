@@ -13,6 +13,8 @@ import DropCardSkeleton from "@/components/lobby/DropCardSkeleton";
 import DropsFilter, { type FilterOption } from "@/components/lobby/DropsFilter";
 import MatchmakingOverlay from "@/components/lobby/MatchmakingOverlay";
 import BottomNav from "@/components/BottomNav";
+import PullToRefreshIndicator from "@/components/PullToRefreshIndicator";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
 import { isToday, isThisWeek } from "date-fns";
 import { toast } from "sonner";
 
