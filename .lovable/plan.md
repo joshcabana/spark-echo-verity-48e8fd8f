@@ -1,75 +1,35 @@
 
 
-## Phase 4: Spark Reflections DB, Chemistry Vault Items DB, Spark Reflection AI Edge Function, Text-Only Vault
+## Quality Check: Dark/Light Theme Toggle
 
-### 1. Database Migrations
+### Current State
 
-**Table: `spark_reflections`**
-- `id` uuid PK default `gen_random_uuid()`
-- `call_id` uuid NOT NULL (references calls)
-- `user_id` uuid NOT NULL (the user who submitted the reflection)
-- `feeling_score` integer (1-5, "How did that feel?")
-- `liked_text` text ("What did you like?")
-- `next_time_text` text ("What would you try next time?")
-- `ai_reflection` text (Gemini-generated reflection)
-- `created_at` timestamptz default now()
-- UNIQUE(call_id, user_id)
-- RLS: user can insert/select/update own only
+The theme toggle implementation is mostly correct:
 
-**Table: `chemistry_vault_items`**
-- `id` uuid PK default `gen_random_uuid()`
-- `call_id` uuid NOT NULL
-- `user_id` uuid NOT NULL
-- `partner_user_id` uuid NOT NULL
-- `title` text
-- `highlights` jsonb default '[]'
-- `user_notes` text
-- `reflection_id` uuid (references spark_reflections)
-- `created_at` timestamptz default now()
-- `updated_at` timestamptz default now()
-- UNIQUE(call_id, user_id)
-- RLS: user can CRUD own only
+- **ThemeProvider** is properly configured in `App.tsx` with `attribute="class"`, `defaultTheme="dark"`, and `enableSystem`
+- **ThemeToggle** component correctly uses `useTheme()` from `next-themes`, handles hydration mismatch with a `mounted` state guard, and renders Sun/Moon icons
+- **AppHeader** renders the toggle on all pages except `/` (landing) and `/call/*` routes
+- **Landing page** has its own Navbar but does **not** include a ThemeToggle — this is a gap
+- **Sonner** correctly reads the theme for toast styling
+- All pages use semantic Tailwind tokens (`bg-background`, `text-foreground`, `text-muted-foreground`, etc.) — no hardcoded colors found in page components
+- CSS variables are properly defined for both `:root` (light) and `.dark` (dark) themes
 
-### 2. Edge Function: `spark-reflection-ai`
+### Issues Found
 
-New edge function that:
-1. Accepts `{ call_id, feeling_score, liked_text, next_time_text }` from authenticated user
-2. Verifies user is a participant in the call
-3. Calls Lovable AI (gemini-2.5-flash) with a system prompt to generate a short reflection: strengths, one improvement, suggested theme
-4. Inserts into `spark_reflections` table
-5. Auto-creates a `chemistry_vault_items` entry for this call+user
-6. Returns the AI reflection text
+1. **No theme toggle on the landing page** — The `AppHeader` explicitly hides on `/`, and the landing `Navbar` does not include a `ThemeToggle`. Users on the landing page have no way to switch themes.
 
-### 3. Update `SparkReflection.tsx`
+2. **Console warning: "Function components cannot be given refs"** — `VerityLogo` is a plain function component but is used inside a `Link` (which may attempt to pass a ref). The `Footer` component triggers this warning. While not theme-specific, it's a real console error on the landing page.
 
-Currently shows hardcoded insights. Upgrade to:
-- Show post-session mini prompts: feeling score (1-5 stars), "What did you like?" textarea, "What would you try next time?" textarea
-- On submit: call `spark-reflection-ai` edge function
-- Display AI-generated reflection when returned
-- Keep "Continue" button behavior unchanged
+3. **`App.css` contains unused legacy styles** — The file has leftover Vite starter styles (`#root { max-width: 1280px }`, logo spin animations) that constrain the root element and conflict with the full-width layout. This can cause subtle layout issues.
 
-### 4. Update Vault Components
+### Plan
 
-**`ReplayVault.tsx`**: Switch from querying `chemistry_replays` to querying `chemistry_vault_items` joined with `spark_reflections`. Display text-only vault entries with partner names.
+**1. Add ThemeToggle to the landing Navbar**
+- Import and render `ThemeToggle` in `src/components/landing/Navbar.tsx`, placed between the nav links and the CTA button in the desktop layout, and at the bottom of the mobile menu.
 
-**`ReplayCard.tsx`**: Show vault item title, AI reflection preview, user notes, and timestamps. No video references.
+**2. Fix VerityLogo ref warning**
+- Wrap `VerityLogo` with `React.forwardRef` so that `Link` can pass refs without triggering the console warning.
 
-### 5. Route + Config
-
-- Add `verify_jwt = false` for `spark-reflection-ai` in `supabase/config.toml`
-- No new routes needed (vault is already a tab in SparkHistory)
-
-### Files
-
-**Create:**
-- `supabase/functions/spark-reflection-ai/index.ts`
-
-**Edit:**
-- `src/components/call/SparkReflection.tsx` — interactive prompts + AI call
-- `src/components/vault/ReplayVault.tsx` — query `chemistry_vault_items`
-- `src/components/vault/ReplayCard.tsx` — display vault item data
-- `supabase/config.toml` — add function entry
-
-**DB Migration:**
-- Create `spark_reflections` and `chemistry_vault_items` tables with RLS
+**3. Remove legacy App.css**
+- Delete `src/App.css` (it is not imported anywhere in the current `App.tsx` or `main.tsx`). If it is imported somewhere, remove the import instead.
 
