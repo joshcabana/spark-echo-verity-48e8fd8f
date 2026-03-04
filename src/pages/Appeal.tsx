@@ -44,14 +44,13 @@ const Appeal = () => {
     const fetchData = async () => {
       setLoading(true);
 
-      // Fetch pending flags (not yet appealed) for this user
+      // Fetch pending flags via restricted view (excludes clip_url)
       const { data: flags } = await supabase
-        .from("moderation_flags")
+        .from("my_moderation_flags" as any)
         .select("id, reason, ai_confidence, created_at")
-        .eq("flagged_user_id", user.id)
         .is("action_taken", null)
         .order("created_at", { ascending: false })
-        .limit(1);
+        .limit(1) as { data: Array<{ id: string; reason: string | null; ai_confidence: number | null; created_at: string }> | null };
 
       // Check if any of these flags already have an appeal
       if (flags && flags.length > 0) {

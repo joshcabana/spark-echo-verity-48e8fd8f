@@ -77,6 +77,13 @@ export type Database = {
             referencedRelation: "moderation_flags"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "appeals_flag_id_fkey"
+            columns: ["flag_id"]
+            isOneToOne: false
+            referencedRelation: "my_moderation_flags"
+            referencedColumns: ["id"]
+          },
         ]
       }
       calls: {
@@ -187,6 +194,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "chemistry_replays_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "my_calls"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "chemistry_replays_spark_id_fkey"
             columns: ["spark_id"]
             isOneToOne: false
@@ -238,6 +252,13 @@ export type Database = {
             columns: ["call_id"]
             isOneToOne: false
             referencedRelation: "calls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chemistry_vault_items_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "my_calls"
             referencedColumns: ["id"]
           },
           {
@@ -364,6 +385,13 @@ export type Database = {
             referencedRelation: "calls"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "guardian_alerts_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "my_calls"
+            referencedColumns: ["id"]
+          },
         ]
       }
       matchmaking_queue: {
@@ -403,6 +431,13 @@ export type Database = {
             columns: ["call_id"]
             isOneToOne: false
             referencedRelation: "calls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matchmaking_queue_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "my_calls"
             referencedColumns: ["id"]
           },
           {
@@ -495,6 +530,13 @@ export type Database = {
             referencedRelation: "calls"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "moderation_events_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "my_calls"
+            referencedColumns: ["id"]
+          },
         ]
       }
       moderation_flags: {
@@ -540,6 +582,13 @@ export type Database = {
             columns: ["call_id"]
             isOneToOne: false
             referencedRelation: "calls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moderation_flags_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "my_calls"
             referencedColumns: ["id"]
           },
         ]
@@ -721,6 +770,13 @@ export type Database = {
             referencedRelation: "calls"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reports_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "my_calls"
+            referencedColumns: ["id"]
+          },
         ]
       }
       rooms: {
@@ -822,6 +878,13 @@ export type Database = {
             referencedRelation: "calls"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "spark_reflections_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "my_calls"
+            referencedColumns: ["id"]
+          },
         ]
       }
       sparks: {
@@ -867,6 +930,13 @@ export type Database = {
             columns: ["call_id"]
             isOneToOne: false
             referencedRelation: "calls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sparks_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "my_calls"
             referencedColumns: ["id"]
           },
         ]
@@ -1023,6 +1093,182 @@ export type Database = {
       }
     }
     Views: {
+      my_calls: {
+        Row: {
+          agora_channel: string | null
+          callee_decision: Database["public"]["Enums"]["spark_decision"] | null
+          callee_id: string | null
+          caller_decision: Database["public"]["Enums"]["spark_decision"] | null
+          caller_id: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string | null
+          is_mutual_spark: boolean | null
+          room_id: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["call_status"] | null
+        }
+        Insert: {
+          agora_channel?: string | null
+          callee_decision?: Database["public"]["Enums"]["spark_decision"] | null
+          callee_id?: string | null
+          caller_decision?: Database["public"]["Enums"]["spark_decision"] | null
+          caller_id?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string | null
+          is_mutual_spark?: boolean | null
+          room_id?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["call_status"] | null
+        }
+        Update: {
+          agora_channel?: string | null
+          callee_decision?: Database["public"]["Enums"]["spark_decision"] | null
+          callee_id?: string | null
+          caller_decision?: Database["public"]["Enums"]["spark_decision"] | null
+          caller_id?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string | null
+          is_mutual_spark?: boolean | null
+          room_id?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["call_status"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      my_chemistry_replays: {
+        Row: {
+          call_id: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          id: string | null
+          spark_id: string | null
+          status: string | null
+          user_a: string | null
+          user_b: string | null
+        }
+        Insert: {
+          call_id?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string | null
+          spark_id?: string | null
+          status?: string | null
+          user_a?: string | null
+          user_b?: string | null
+        }
+        Update: {
+          call_id?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string | null
+          spark_id?: string | null
+          status?: string | null
+          user_a?: string | null
+          user_b?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chemistry_replays_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "calls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chemistry_replays_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "my_calls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chemistry_replays_spark_id_fkey"
+            columns: ["spark_id"]
+            isOneToOne: false
+            referencedRelation: "sparks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      my_messages: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string | null
+          is_read: boolean | null
+          is_voice: boolean | null
+          sender_id: string | null
+          spark_id: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_read?: boolean | null
+          is_voice?: boolean | null
+          sender_id?: string | null
+          spark_id?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_read?: boolean | null
+          is_voice?: boolean | null
+          sender_id?: string | null
+          spark_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_spark_id_fkey"
+            columns: ["spark_id"]
+            isOneToOne: false
+            referencedRelation: "sparks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      my_moderation_flags: {
+        Row: {
+          action_taken: Database["public"]["Enums"]["moderation_action"] | null
+          ai_confidence: number | null
+          created_at: string | null
+          id: string | null
+          reason: string | null
+          reviewed_at: string | null
+        }
+        Insert: {
+          action_taken?: Database["public"]["Enums"]["moderation_action"] | null
+          ai_confidence?: number | null
+          created_at?: string | null
+          id?: string | null
+          reason?: string | null
+          reviewed_at?: string | null
+        }
+        Update: {
+          action_taken?: Database["public"]["Enums"]["moderation_action"] | null
+          ai_confidence?: number | null
+          created_at?: string | null
+          id?: string | null
+          reason?: string | null
+          reviewed_at?: string | null
+        }
+        Relationships: []
+      }
       public_profiles: {
         Row: {
           avatar_url: string | null
