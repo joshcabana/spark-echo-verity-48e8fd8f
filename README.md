@@ -93,7 +93,6 @@
 
 ### In Progress 🔄
 - Tuning AI moderation thresholds and browser transcript coverage fallbacks
-- Configuring Agora REST API credentials (`AGORA_CUSTOMER_KEY`, `AGORA_CUSTOMER_SECRET`) for live cloud recording
 ### Upcoming 📋
 - Granular drop scheduling (region targeting, capacity management)
 
