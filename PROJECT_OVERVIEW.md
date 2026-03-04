@@ -31,7 +31,7 @@ Verity is a verified, safety-first speed-dating platform built around 45-second 
 | **Backend** | Supabase (PostgreSQL + RLS) | 20 tables, 6 custom enums, 13 RPC functions, row-level security policies |
 | **Edge Functions** | 16 Deno functions on Supabase | Matchmaking, video auth, AI moderation, payments, appeals, admin moderation, push notifications, stats aggregation, feature flags, VAPID keys, friend invites, demo tokens |
 | **Video** | Agora RTC SDK | 45-second sessions with server-issued tokens (10-minute expiry), call participation verified server-side |
-| **Payments** | Stripe | Checkout Sessions, Billing Portal, Webhooks with idempotency via `stripe_processed_events` |
+| **Payments** | Stripe | Checkout Sessions (all Dashboard-configured payment methods including Apple Pay & Google Pay), Billing Portal, Webhooks with idempotency via `stripe_processed_events` |
 | **AI Moderation** | Lovable AI Gateway (Gemini 2.5 Flash Lite) | Tool-use based structured risk scoring with policy-driven violation detection |
 | **Deployment** | Lovable.app + Supabase Cloud | Frontend hosted on Lovable; backend on Supabase managed infrastructure |
 
@@ -72,7 +72,7 @@ Verity is a verified, safety-first speed-dating platform built around 45-second 
 | `agora-token` | Issues Agora RTC tokens with 10-minute expiry after verifying user is a participant in the requested call |
 | `agora-demo-token` | Issues demo Agora tokens for development/testing without call-participation checks |
 | `ai-moderate` | Analyzes call transcripts/metadata via LLM (Gemini 2.5 Flash Lite) with tool-use; returns structured risk score, violation flag, and reason |
-| `create-checkout` | Creates Stripe Checkout sessions; validates JWT auth, origin allowlist, and price-ID allowlist; maps to payment or subscription mode |
+| `create-checkout` | Creates Stripe Checkout sessions with dynamic payment method support (Apple Pay, Google Pay, cards, etc.); validates JWT auth, origin allowlist, and price-ID allowlist; maps to payment or subscription mode |
 | `stripe-webhook` | Processes Stripe events (`checkout.session.completed`, `customer.subscription.deleted`); idempotent via `stripe_processed_events`; credits tokens or updates subscription tier |
 | `customer-portal` | Creates Stripe Billing Portal sessions for subscription management; validates return URL against origin allowlist |
 | `check-subscription` | Verifies user's current subscription status against Stripe |
@@ -133,7 +133,7 @@ Verity is a verified, safety-first speed-dating platform built around 45-second 
 - Atomic matchmaking with block-list filtering (`find-match`)
 - Agora token issuance with server-side call participation verification (`agora-token`)
 - AI moderation via real LLM (Lovable AI Gateway / Gemini 2.5 Flash Lite) with structured tool-use and policy-based risk scoring (`ai-moderate`)
-- Stripe payment flow: checkout creation with price-ID allowlist, webhook processing with idempotency, customer portal with origin-validated return URLs
+- Stripe payment flow: checkout with dynamic payment methods (Apple Pay, Google Pay, cards, etc. via Dashboard configuration), price-ID allowlist, webhook processing with idempotency, customer portal with origin-validated return URLs
 - Admin moderation actions persisted to `moderation_flags` with audit trail
 - Push notification system: VAPID key generation, subscription management, notification dispatch
 - Automated platform stats aggregation via `aggregate-stats` cron
