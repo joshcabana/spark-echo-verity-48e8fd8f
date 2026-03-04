@@ -123,7 +123,7 @@ const SparkHistory = () => {
     });
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div ref={containerRef} className="min-h-screen bg-background pb-20 overflow-auto">
       <Tabs defaultValue="sparks" className="w-full">
         <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border">
           <div className="container max-w-2xl mx-auto px-5 pt-5 pb-4">
