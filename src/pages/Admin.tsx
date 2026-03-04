@@ -263,6 +263,30 @@ const Admin = () => {
       .sort((a, b) => b.count - a.count);
   })();
 
+  // ═══ DROPS QUERIES ═══
+
+  const { data: adminDrops = [] } = useQuery({
+    queryKey: ["admin-drops"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("drops")
+        .select("*, rooms(name)")
+        .order("scheduled_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: rooms = [] } = useQuery({
+    queryKey: ["admin-rooms"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("rooms").select("id, name").order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // ═══ MUTATIONS ═══
 
   const flagActionMutation = useMutation({
