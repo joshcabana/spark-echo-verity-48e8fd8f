@@ -6,6 +6,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Moderation threshold constants
+const SAFE_THRESHOLD = 0.3;    // Below this: skip DB writes entirely (false-positive guard)
+const WARN_THRESHOLD = 0.6;    // At or above: flag for human review
+const AUTO_ACTION_THRESHOLD = 0.85; // At or above: auto-warn the user
+
 const SYSTEM_PROMPT = `You are a safety moderation system for a video dating platform called Verity. Your job is to analyze text transcripts and behavioral metadata from live video calls and determine if any policy violations are occurring.
 
 Policy violations include:

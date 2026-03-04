@@ -24,7 +24,7 @@ const innovations = [
     icon: Film,
     title: "Chemistry Replay Vault",
     description:
-      "A private 8-second anonymised highlight reel from your call — for your eyes only. Unlocked with Verity Pass. Never shared, never public.",
+      "Session notes, AI insights, and timestamps from your mutual Spark calls — for your eyes only. Unlocked with Verity Pass. No video stored, ever.",
   },
 ];
 

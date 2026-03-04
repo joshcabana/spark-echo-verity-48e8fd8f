@@ -17,7 +17,7 @@ const sections = [
   {
     title: "Data Storage & Retention",
     content:
-      "Data is stored on secure, encrypted servers. Call metadata is retained for moderation review and deleted within 30 days. If no mutual spark occurs, no trace of the call is kept. Chemistry Replay Vault clips are private, encrypted, and accessible only to the user who owns them.",
+      "Data is stored on secure, encrypted servers. Call metadata is retained for moderation review and deleted within 30 days. If no mutual spark occurs, no trace of the call is kept. The Chemistry Replay Vault stores only text-based session notes, AI insights, and timestamps — no video or audio is ever recorded or stored.",
   },
   {
     title: "Your Rights",

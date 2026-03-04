@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Play, Lock } from "lucide-react";
+import { FileText, Lock } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
@@ -8,7 +8,6 @@ interface ReplayCardProps {
   replay: {
     id: string;
     spark_id: string;
-    video_url: string | null;
     status: string;
     duration_seconds: number;
     created_at: string;
@@ -16,14 +15,11 @@ interface ReplayCardProps {
   };
   index: number;
   isSubscriber: boolean;
-  onPlay: (replay: ReplayCardProps["replay"]) => void;
+  onView: (replay: ReplayCardProps["replay"]) => void;
   onUpgrade: () => void;
 }
 
-const ReplayCard = ({ replay, index, isSubscriber, onPlay, onUpgrade }: ReplayCardProps) => {
-  const isReady = replay.status === "ready";
-  const isProcessing = replay.status === "processing";
-
+const ReplayCard = ({ replay, index, isSubscriber, onView, onUpgrade }: ReplayCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -32,20 +28,16 @@ const ReplayCard = ({ replay, index, isSubscriber, onPlay, onUpgrade }: ReplayCa
     >
       <Card className="overflow-hidden border-border/50">
         <CardContent className="p-4 flex items-center gap-4">
-          {/* Thumbnail / play area */}
+          {/* Icon area */}
           <div className="relative w-16 h-16 rounded-lg bg-secondary/50 flex items-center justify-center shrink-0">
             {!isSubscriber ? (
               <button onClick={onUpgrade} className="w-full h-full flex items-center justify-center backdrop-blur-sm rounded-lg">
                 <Lock className="w-5 h-5 text-muted-foreground" />
               </button>
-            ) : isProcessing ? (
-              <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            ) : isReady ? (
-              <button onClick={() => onPlay(replay)} className="w-full h-full flex items-center justify-center hover:bg-primary/10 rounded-lg transition-colors">
-                <Play className="w-6 h-6 text-primary fill-primary" />
-              </button>
             ) : (
-              <span className="text-xs text-muted-foreground">Error</span>
+              <button onClick={() => onView(replay)} className="w-full h-full flex items-center justify-center hover:bg-primary/10 rounded-lg transition-colors">
+                <FileText className="w-6 h-6 text-primary" />
+              </button>
             )}
           </div>
 
@@ -55,9 +47,9 @@ const ReplayCard = ({ replay, index, isSubscriber, onPlay, onUpgrade }: ReplayCa
             <p className="text-xs text-muted-foreground">
               {replay.duration_seconds}s moment · {formatDistanceToNow(new Date(replay.created_at), { addSuffix: true })}
             </p>
-            {isProcessing && (
-              <p className="text-xs text-primary mt-0.5">Processing…</p>
-            )}
+            <p className="text-xs text-muted-foreground/60 mt-0.5">
+              Session notes & AI insights
+            </p>
           </div>
 
           {/* CTA for non-subscribers */}
