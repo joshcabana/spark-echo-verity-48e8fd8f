@@ -1,75 +1,129 @@
 
 
-## Phase 4: Spark Reflections DB, Chemistry Vault Items DB, Spark Reflection AI Edge Function, Text-Only Vault
+## Phase 5: Granular Drop Scheduling, Real-time Enhancements, Data Export/Deletion, Polish
 
-### 1. Database Migrations
+### Overview
 
-**Table: `spark_reflections`**
-- `id` uuid PK default `gen_random_uuid()`
-- `call_id` uuid NOT NULL (references calls)
-- `user_id` uuid NOT NULL (the user who submitted the reflection)
-- `feeling_score` integer (1-5, "How did that feel?")
-- `liked_text` text ("What did you like?")
-- `next_time_text` text ("What would you try next time?")
-- `ai_reflection` text (Gemini-generated reflection)
-- `created_at` timestamptz default now()
-- UNIQUE(call_id, user_id)
-- RLS: user can insert/select/update own only
+Four workstreams: (1) Admin drop CRUD, (2) real-time UX improvements for Lobby and Chat, (3) functional data export and account deletion, (4) end-to-end polish and error states.
 
-**Table: `chemistry_vault_items`**
-- `id` uuid PK default `gen_random_uuid()`
-- `call_id` uuid NOT NULL
-- `user_id` uuid NOT NULL
-- `partner_user_id` uuid NOT NULL
-- `title` text
-- `highlights` jsonb default '[]'
-- `user_notes` text
-- `reflection_id` uuid (references spark_reflections)
-- `created_at` timestamptz default now()
-- `updated_at` timestamptz default now()
-- UNIQUE(call_id, user_id)
-- RLS: user can CRUD own only
+---
 
-### 2. Edge Function: `spark-reflection-ai`
+### 1. Admin Drop Scheduling (CRUD)
 
-New edge function that:
-1. Accepts `{ call_id, feeling_score, liked_text, next_time_text }` from authenticated user
-2. Verifies user is a participant in the call
-3. Calls Lovable AI (gemini-2.5-flash) with a system prompt to generate a short reflection: strengths, one improvement, suggested theme
-4. Inserts into `spark_reflections` table
-5. Auto-creates a `chemistry_vault_items` entry for this call+user
-6. Returns the AI reflection text
+Add a "Drops" section to the Admin page for creating/editing/deleting Drops.
 
-### 3. Update `SparkReflection.tsx`
+**Add to `src/pages/Admin.tsx`:**
+- New `AdminSection` value: `"drops"`
+- New nav item with Calendar icon
+- Drop management UI:
+  - "Create Drop" form: title, description, room (select from `rooms` table), scheduled_at (datetime picker), duration_minutes, max_capacity, region (AU/NZ/US/UK), timezone, is_friendfluence toggle
+  - Table listing all drops (not just upcoming) with edit/delete actions
+  - Edit modal pre-populated with drop data
+  - Delete with confirmation dialog
+- All operations use direct Supabase client (admin RLS policies already allow full CRUD)
 
-Currently shows hardcoded insights. Upgrade to:
-- Show post-session mini prompts: feeling score (1-5 stars), "What did you like?" textarea, "What would you try next time?" textarea
-- On submit: call `spark-reflection-ai` edge function
-- Display AI-generated reflection when returned
-- Keep "Continue" button behavior unchanged
+**No DB changes needed** — `drops` table already has all columns and admin RLS.
 
-### 4. Update Vault Components
+---
 
-**`ReplayVault.tsx`**: Switch from querying `chemistry_replays` to querying `chemistry_vault_items` joined with `spark_reflections`. Display text-only vault entries with partner names.
+### 2. Real-time Enhancements
 
-**`ReplayCard.tsx`**: Show vault item title, AI reflection preview, user notes, and timestamps. No video references.
+**2a. Typing indicators in Chat (`src/pages/Chat.tsx`)**
+- Use Supabase Realtime Broadcast (not DB) for ephemeral typing events
+- On composer input, broadcast `{ event: "typing", payload: { user_id } }` to channel `typing-{sparkId}`
+- Listen for partner typing broadcasts; show `TypingIndicator` component (already exists) when partner is typing
+- Auto-hide after 3 seconds of no typing events
 
-### 5. Route + Config
+**2b. Live participant count in Lobby (`src/pages/Lobby.tsx`)**
+- Already has realtime subscription for `drops` and `drop_rsvps` tables — this is working
+- Add live count of users currently in matchmaking queue per drop: query `matchmaking_queue` where `status = 'waiting'` and `drop_id = X`
+- Display "X people waiting" badge on live drops in `DropCard`
 
-- Add `verify_jwt = false` for `spark-reflection-ai` in `supabase/config.toml`
-- No new routes needed (vault is already a tab in SparkHistory)
+**2c. Update `src/components/lobby/DropCard.tsx`:**
+- Accept optional `waitingCount` prop
+- Show "X people waiting" indicator on live drops
 
-### Files
+---
 
-**Create:**
-- `supabase/functions/spark-reflection-ai/index.ts`
+### 3. Data Export & Account Deletion
 
-**Edit:**
-- `src/components/call/SparkReflection.tsx` — interactive prompts + AI call
-- `src/components/vault/ReplayVault.tsx` — query `chemistry_vault_items`
-- `src/components/vault/ReplayCard.tsx` — display vault item data
-- `supabase/config.toml` — add function entry
+**3a. Data export edge function**
 
-**DB Migration:**
-- Create `spark_reflections` and `chemistry_vault_items` tables with RLS
+**Create `supabase/functions/export-my-data/index.ts`:**
+- Authenticated endpoint
+- Queries all user-owned data: profile, user_trust, sparks, messages, spark_reflections, chemistry_vault_items, reports, appeals, token_transactions
+- Returns JSON blob with all data
+- No PII of other users (partner names redacted to "Spark partner")
+
+**3b. Account deletion RPC**
+
+**DB migration — create `delete_my_account` function:**
+```sql
+CREATE OR REPLACE FUNCTION public.delete_my_account()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  -- Delete user-owned data
+  DELETE FROM chemistry_vault_items WHERE user_id = auth.uid();
+  DELETE FROM spark_reflections WHERE user_id = auth.uid();
+  DELETE FROM messages WHERE sender_id = auth.uid();
+  DELETE FROM drop_rsvps WHERE user_id = auth.uid();
+  DELETE FROM push_subscriptions WHERE user_id = auth.uid();
+  DELETE FROM user_blocks WHERE blocker_id = auth.uid();
+  DELETE FROM token_transactions WHERE user_id = auth.uid();
+  DELETE FROM user_payment_info WHERE user_id = auth.uid();
+  DELETE FROM user_trust WHERE user_id = auth.uid();
+  DELETE FROM user_roles WHERE user_id = auth.uid();
+  DELETE FROM profiles WHERE user_id = auth.uid();
+  -- Note: auth.users deletion requires admin API — mark profile as deleted
+END;
+$$;
+```
+
+Note: Full auth user deletion requires the service role. The RPC will clean up all public schema data. We'll also create a small edge function to handle the auth.users deletion.
+
+**Create `supabase/functions/delete-account/index.ts`:**
+- Authenticated endpoint
+- Calls `delete_my_account()` RPC via service role client
+- Then deletes the auth user via `adminClient.auth.admin.deleteUser(userId)`
+- Returns success
+
+**3c. Update `src/pages/Settings.tsx`:**
+- Wire "Download my data" to call `export-my-data` edge function and trigger browser download of JSON file
+- Wire "Delete my account" to call `delete-account` edge function, then sign out and redirect to `/`
+
+---
+
+### 4. End-to-End Polish
+
+**4a. Error states and loading states:**
+- Add error boundaries / error UI to Lobby, SparkHistory, Chat for failed queries
+- Add skeleton loaders to DropCard list and SparkCard list while loading
+
+**4b. Mobile responsiveness check:**
+- Ensure GreenRoom camera preview scales on small screens
+- Verify Admin drop management works on mobile (scrollable table)
+
+---
+
+### Files to create (3)
+- `supabase/functions/export-my-data/index.ts`
+- `supabase/functions/delete-account/index.ts`
+
+### Files to edit (5)
+- `src/pages/Admin.tsx` — add Drops management section
+- `src/pages/Chat.tsx` — typing indicator via Realtime Broadcast
+- `src/pages/Lobby.tsx` — matchmaking queue waiting counts
+- `src/components/lobby/DropCard.tsx` — waiting count display
+- `src/pages/Settings.tsx` — wire data export and account deletion
+
+### DB migration (1)
+- Create `delete_my_account()` RPC function
+- Add DELETE policies to `token_transactions` and `user_trust` tables (currently missing DELETE permissions)
+
+### Config
+- Add `export-my-data` and `delete-account` to `supabase/config.toml` with `verify_jwt = false`
 
