@@ -361,14 +361,8 @@ const Lobby = () => {
           )}
         </div>
 
-        {!dropsLoading && filtered.length === 0 ? null : !dropsLoading && filtered.length > 0 ? null : null}
 
-        {filtered.length > 0 && (
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="text-center text-muted-foreground py-16 text-sm">
-            {filter === "my-rsvps" ? "You haven't RSVP'd to any Drops yet." : "No Drops scheduled — check back soon."}
-          </motion.p>
-        )}
+
 
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.8 }}
           className="mt-10 mb-6 text-center text-[11px] text-muted-foreground/40 leading-relaxed">

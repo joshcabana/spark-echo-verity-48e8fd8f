@@ -143,7 +143,11 @@ const SparkHistory = () => {
                 </button>
               ))}
             </div>
-            {filtered.length === 0 ? (
+            {sparksLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 4 }).map((_, i) => <SparkCardSkeleton key={i} />)}
+              </div>
+            ) : filtered.length === 0 ? (
               <SparkEmptyState />
             ) : (
               <div className="space-y-3">
