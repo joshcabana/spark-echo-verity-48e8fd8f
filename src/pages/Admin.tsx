@@ -95,7 +95,31 @@ const PilotMetrics = () => {
   );
 };
 
-type AdminSection = "moderation" | "appeals" | "analytics" | "pilot" | "users" | "guardian" | "settings";
+type AdminSection = "moderation" | "appeals" | "analytics" | "pilot" | "users" | "guardian" | "drops" | "settings";
+
+interface DropForm {
+  title: string;
+  description: string;
+  room_id: string;
+  scheduled_at: string;
+  duration_minutes: number;
+  max_capacity: number;
+  region: string;
+  timezone: string;
+  is_friendfluence: boolean;
+}
+
+const emptyDropForm: DropForm = {
+  title: "",
+  description: "",
+  room_id: "",
+  scheduled_at: "",
+  duration_minutes: 60,
+  max_capacity: 50,
+  region: "AU",
+  timezone: "Australia/Sydney",
+  is_friendfluence: false,
+};
 
 const chartConfig = {
   sparks: { label: "Sparks", color: "hsl(43 72% 55%)" },
