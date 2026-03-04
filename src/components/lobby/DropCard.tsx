@@ -29,7 +29,7 @@ interface DropCardProps {
   waitingCount?: number;
 }
 
-const DropCard = ({ drop, rsvpCount, isRsvpd, onRsvp, onCancel, onJoin, trustComplete, index }: DropCardProps) => {
+const DropCard = ({ drop, rsvpCount, isRsvpd, onRsvp, onCancel, onJoin, trustComplete, index, waitingCount = 0 }: DropCardProps) => {
   const isLive = drop.status === "live";
   const capacityPercent = Math.min((rsvpCount / drop.max_capacity) * 100, 100);
   const minutesUntil = differenceInMinutes(new Date(drop.scheduled_at), new Date());
