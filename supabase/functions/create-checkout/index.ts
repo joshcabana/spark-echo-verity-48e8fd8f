@@ -120,7 +120,6 @@ serve(async (req) => {
     }
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
       line_items: [{ price: price_id, quantity: 1 }],
       mode: priceConfig.mode,
       success_url,
