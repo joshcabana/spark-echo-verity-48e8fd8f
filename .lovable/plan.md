@@ -1,123 +1,163 @@
-## Plan: Landing Page Overhaul, About Page, Moderation Tuning, Tests & Documentation
 
-This is a large request with ~8 distinct workstreams. Here's the plan, grouped by area.
+
+## Plan: Verity Full Build — Phased Implementation
+
+This spec describes a complete application rebuild across 17 sections. The current codebase already implements ~60% of the functionality (auth, matchmaking, Agora video, moderation, Stripe, Drops, Sparks, chat, admin). The gaps are significant but well-defined. Given the scope, this must be broken into sequential phases — attempting everything at once will break the working codebase.
 
 ---
 
-### 1. Landing Page — SEO & Crawlability
+### Current State Assessment
 
-**Problem:** Meta tags exist in `index.html` and JSON-LD is in `Landing.tsx` via react-helmet, but crawlers that don't execute JS won't see the JSON-LD. The OG tags are already in `index.html` (good). No hydration flash issue exists (body has `background-color: #0a0a0a`).
+**Already working:**
+- Auth (email/password signup + login + email verification)
+- Onboarding (3-step: excitement → magic link → verify)
+- Lobby with Drops, RSVPs, matchmaking (server-side with atomic locking)
+- 45-second live video calls via Agora
+- Spark/Pass decision flow with server-side mutual resolution
+- Post-call Voice Intro + chat unlock
+- AI moderation (Gemini via Lovable AI, structured tool calling, thresholds)
+- Stripe checkout + webhook + customer portal
+- Guardian Net, safe exit, report flow
+- Admin dashboard with analytics + pilot metrics
+- Transparency page with live stats
+- Privacy, About pages
+- Feature flags system (Phase 4 toggles)
+- Push notifications
+- 11 test suites, 38 tests passing
 
-**Changes:**
+**Guardrail violations to fix (CRITICAL):**
+1. **Raw video track published** — `useAgoraCall.ts` publishes the raw camera track. Spec requires canvas-processed anonymized track pre-Spark.
+2. **Cloud recording exists** — `start-cloud-recording` and `stop-cloud-recording` edge functions + `LiveCall.tsx` calls them. Spec says NO video storage ever.
+3. **Chemistry Replay Vault references video** — `chemistry_replays.video_url`, `ReplayVault.tsx`, `ReplayCard.tsx` all reference video playback. Must be text-only.
+4. **Privacy page** mentions "Chemistry Replay Vault clips" implying video storage.
 
-- Move JSON-LD `<script>` from `Landing.tsx` (react-helmet) into `index.html` `<head>` so it's available on first paint without JS execution
-- Verify meta description already in `index.html` (it is — no change needed)
-- Add `<noscript>` fallback content in `index.html` for crawlers that don't run JS (headline + description text)
-- No "Powered by" branding found anywhere — confirmed clean
+**Missing pages/routes (from spec):**
+- `/how-it-works` (standalone page, currently only an anchor section)
+- `/safety` (dedicated safety promise page)
+- `/terms` (terms of service)
+- `/faq` (with FAQPage JSON-LD)
+- `/drops` (public schedule, SEO-indexable)
+- `/drops/:city/:theme/:datetime` (individual event pages with Event schema)
+- `/pricing` (standalone pricing page)
+- `/login` and `/signup` (currently unified at `/auth`)
+- `/app/*` prefix for authenticated routes (spec wants this; current uses flat routes)
+- `/app/green-room` (camera/mic/network check before lobby)
+- `/app/verify` (currently part of onboarding)
+- `/app/vault` (text-only vault page)
+- `/app/settings` (data deletion, account management)
 
-### 2. Landing Page — Trust Signals & Content Enhancements
+**Missing DB tables (from spec):**
+- `verification` (separate from `user_trust`)
+- `drop_sessions` (per-pair session record, currently `calls` covers this)
+- `spark_reflections` (text insights post-call)
+- `chemistry_vault_items` (text-only vault entries)
+- `subscriptions` (currently using `profiles.subscription_tier`)
+- `chat_threads` (currently messages link directly to sparks)
 
-**Problem:** The old review flagged missing trust signals and stats needing 2025/26 citations.
+---
 
-**Changes to existing components:**
+### Phased Implementation Plan
 
-- `**StatsSection.tsx**`: Stats already reference "Forbes Health 2025/26" and "Industry data 2026" — already current. No change needed.
-- `**FeaturesSection.tsx**`: Already has the six pillars. No change needed.
-- `**InnovationsSection.tsx**`: Already has the four innovations. No change needed.
-- `**HeroSection.tsx**`: Headline already says "Real chemistry in 45 seconds... Dignity always." No change needed.
-- `**Footer.tsx**`: Add trust line "18+ verified · Nothing stored until mutual Spark", add "About" link, add "Australian Built 🇦🇺" badge
-- `**Navbar.tsx**`: Add "About" link in the nav
+Given the size, I recommend implementing in 4 phases. Each phase ships working code.
 
-### 3. New About Page (`/about`)
+#### Phase 1: Guardrail Fixes (MOST CRITICAL — do first)
 
-**Create `src/pages/About.tsx`:**
+These are non-negotiable security/privacy violations.
 
-- Solo founder story: "Built by a solo Australian developer in Canberra, 2026"
-- Why Verity exists (the burnout stats motivation)
-- "No team page yet — this is a one-person project built with conviction"
-- Dark + gold styling consistent with brand
-- Add route in `App.tsx`
+1. **Canvas-processed anonymous video track**
+   - Modify `useAgoraCall.ts`: capture camera → draw to offscreen canvas with anonymization filter (pixelation/silhouette) → create `MediaStreamTrack` from canvas → publish that track instead of raw camera
+   - On mutual Spark event: swap published track to raw camera track
+   - This ensures the remote user never receives raw video pre-Spark
 
-### 4. Footer Enhancements
+2. **Remove cloud recording**
+   - Delete calls to `start-cloud-recording` and `stop-cloud-recording` from `LiveCall.tsx` (lines 175-200)
+   - Remove or gate the edge functions behind a disabled feature flag
+   - Remove `recording_url`, `recording_sid`, `recording_resource_id` references from UI code (DB columns can remain dormant)
 
-**Edit `Footer.tsx`:**
+3. **Chemistry Replay Vault → text-only**
+   - Update `InnovationsSection.tsx` description: remove "8-second anonymised highlight reel" → "session notes, AI insights, and timestamps from your mutual Spark calls"
+   - Update `ReplayVault.tsx` and `ReplayCard.tsx`: remove video playback, show text artifacts (timestamps, user notes, AI reflection text)
+   - Update Privacy page: remove "clips" language
 
-- Add "About" link
-- Add trust badge line: "18+ verified · Nothing stored until mutual Spark"
-- Add "Australian Built" small badge/text
+4. **Update `ai-moderate` edge function** — add missing threshold constants declaration (currently references `SAFE_THRESHOLD`, `WARN_THRESHOLD`, `AUTO_ACTION_THRESHOLD` but they may not be declared at the top of the file)
 
-### 5. Admin Pilot Metrics Dashboard (Surface Existing Data)
+#### Phase 2: Public Marketing Pages + SEO
 
-**Problem:** The old review's #1 strategic warning was lack of real-time pilot metrics visibility.
+New standalone pages for SEO, all public (no auth required), no Agora/Stripe imports:
 
-**Changes:**
+1. **`/how-it-works`** — full-page version of the 4-step flow with visual treatment
+2. **`/safety`** — dedicated safety promise page (zero-tolerance, verification, moderation, no recordings, Guardian Net, appeal flow)
+3. **`/terms`** — terms of service page
+4. **`/faq`** — FAQ page with FAQPage JSON-LD schema, answering the 7 objections from the spec
+5. **`/drops`** — public Drops schedule (read-only, no auth; shows upcoming events with RSVP CTA that goes to `/auth`)
+6. **`/pricing`** — Verity Pass vs Free comparison, "Cancel anytime", Stripe-powered
+7. **Update Navbar** — add links: How it works, Drops, Safety, Pricing + "RSVP for the next Drop" primary CTA
+8. **Hero updates** — update headline per spec: "Anonymous 45-second video dates. Reveal only with mutual Spark." + trust chips above fold + "Watch 20s demo" CTA
+9. **Next Drop strip** — show upcoming Drop time with countdown on landing page
+10. **Trust/Safety section** on landing — "Built for safety — not virality." with bullets
+11. **Footer** — add Terms, FAQ, Safety links
+12. **SEO** — add Organization JSON-LD in footer, Event schema on drop pages, FAQPage schema, sitemap.xml
 
-- The Admin page already has an Analytics section with platform stats, room stats, gender balance chart, and moderation flags. This is already wired to real data from `platform_stats`.
-- Add a new "Pilot" admin section that surfaces: call completion rate (calls with `ended_at` vs total), mutual spark rate (calls with `is_mutual_spark=true` / total), moderation false-positive estimate (flags with `action_taken='clear'` / total flags)
-- These are simple SELECT queries against existing tables — no new tables needed
-- No feature flag toggle needed since this is already behind `requireAdmin` route guard
+#### Phase 3: Route Restructuring + New App Pages
 
-### 6. AI Moderation Tuning
+1. **Green Room (`/app/green-room`)** — camera preview, mic meter (via `AudioContext` analyser), network quality check, lighting tips, "Anonymous filter ON" indicator, Guardian Net onboarding option
+2. **Settings page (`/app/settings`)** — account management, data deletion with re-auth, subscription management
+3. **Auth split** — `/login` and `/signup` as separate routes (or keep unified with URL-driven mode toggle)
+4. **Route prefix migration** — evaluate whether to add `/app/` prefix or keep current flat structure (this is a significant breaking change to URLs and would need redirects)
 
-**Problem:** The `ai-moderate` edge function is fully wired but needs safe defaults and the browser transcript fallback is already implemented in `LiveCall.tsx` (SpeechRecognition API with `transcriptAvailable` flag).
+#### Phase 4: DB Schema Additions + Spark Reflection AI
 
-**Changes:**
-
-- `**ai-moderate/index.ts**`: Add threshold constants at top (`WARN_THRESHOLD = 0.6`, `AUTO_ACTION_THRESHOLD = 0.85`, `SAFE_THRESHOLD = 0.3`). Below `SAFE_THRESHOLD`, skip DB writes entirely. Between thresholds, flag for human review. Above `AUTO_ACTION_THRESHOLD`, auto-warn. These are already partially implemented — formalize them as named constants.
-- **No new edge function needed** — the appeal flow already exists via `submit-appeal` edge function and the Appeals page
-- The browser transcript fallback is already working (LiveCall.tsx lines 212-241) — no changes needed
-
-### 7. Vitest: Moderation False-Positive Test
-
-**Create/extend `src/test/liveCallModerationWiring.test.ts`:**
-
-- Add test: "treats low-score results as safe (false-positive guard)" — verify that `isModerationFlagged({ flagged: false, safe: true, score: 0.2 })` returns `false`
-- Add test: "does not flag when score is below safe threshold" — verify score < 0.3 is treated as safe
-- This extends the existing moderation test file
-
-### 8. README & Documentation Polish
-
-**Edit `README.md`:**
-
-- Add "Pilot Results" section with placeholder metrics (call completion rate, spark rate, moderation accuracy — TBD numbers)
-- Add "Architecture" section with note: "See PROJECT_OVERVIEW.md for full architecture documentation"
-- Add "Deployment Checklist" section for public beta (environment secrets, Stripe webhooks, Agora credentials, feature flag defaults)
-- Confirm Phase 4 innovations are behind feature flags (they are — the feature flags system exists via `app_config` and `get-feature-flags`)
-
-### 9. Scope Discipline — Feature Flags
-
-**Current state:** The feature flag system reads from `app_config` table, currently only supporting `require_phone_verification`. Phase 4 features (Replay Vault, Friendfluence, Guardian Net, Voice Intro) are built into the UI without explicit feature flag gates.
-
-**Changes:**
-
-- Extend the feature flags system to include toggles for Phase 4 features: `enable_replay_vault`, `enable_friendfluence`, `enable_voice_intro`, `enable_guardian_net`
-- Update `get-feature-flags` edge function and `featureFlags.ts` to parse these new flags
-- Add conditional rendering checks in the relevant pages/components
-- Default all to `true` (currently live) so nothing breaks
+1. **`spark_reflections` table** — post-session mini prompts ("How did that feel?", "What did you like?") + Gemini-generated reflection text
+2. **`chemistry_vault_items` table** — text-only vault entries (title, highlights JSON, user notes, timestamps)
+3. **Spark Reflection AI edge function** — takes user inputs + call metadata, calls Gemini for reflection text, stores in `spark_reflections`
+4. **Vault page** — displays text-only vault items
 
 ---
 
 ### Technical Details
 
-**Files to create:**
+**Phase 1 — Canvas anonymization approach:**
+```text
+Camera Track → Canvas (requestAnimationFrame loop)
+  → Apply filter (gaussian blur / pixelation / silhouette)
+  → canvas.captureStream().getVideoTracks()[0]
+  → Publish this processed track via Agora
+  → On mutual_spark event: client.unpublish(processed) → client.publish(rawCamera)
+```
 
-- `src/pages/About.tsx` — new About/founder story page
+This runs entirely client-side. The remote user's Agora SDK receives only the processed track. There is no CSS blur to bypass via DevTools.
 
-**Files to edit:**
+**Phase 1 — Files to edit:**
+- `src/hooks/useAgoraCall.ts` — canvas processing + track swap logic
+- `src/pages/LiveCall.tsx` — remove cloud recording calls (lines 175-200)
+- `src/components/landing/InnovationsSection.tsx` — update Vault description
+- `src/components/vault/ReplayVault.tsx` — text-only display
+- `src/components/vault/ReplayCard.tsx` — text-only display
+- `src/pages/Privacy.tsx` — remove video clip references
 
-- `index.html` — add JSON-LD in `<head>`, add `<noscript>` fallback
-- `src/pages/Landing.tsx` — remove JSON-LD from Helmet (now in index.html)
-- `src/components/landing/Footer.tsx` — trust badge, About link, Australian Built
-- `src/components/landing/Navbar.tsx` — About link
-- `src/App.tsx` — add `/about` route
-- `src/pages/Admin.tsx` — add "Pilot" section with completion/spark/FP metrics
-- `supabase/functions/ai-moderate/index.ts` — named threshold constants
-- `src/test/liveCallModerationWiring.test.ts` — false-positive guard test
-- `src/lib/moderation.ts` — add score-based threshold helper
-- `src/lib/featureFlags.ts` — add Phase 4 feature flag fields
-- `supabase/functions/get-feature-flags/flags-parser.ts` — parse new flags
-- `README.md` — pilot results, architecture link, deployment checklist
+**Phase 2 — Files to create:**
+- `src/pages/HowItWorks.tsx`
+- `src/pages/Safety.tsx`
+- `src/pages/Terms.tsx`
+- `src/pages/FAQ.tsx`
+- `src/pages/Drops.tsx` (public schedule)
+- `src/pages/Pricing.tsx`
+- `public/sitemap.xml`
 
-**Files NOT touched:** All existing working components, pages, hooks, contexts, edge functions (except the targeted edits above). No structural refactors.
+**Phase 2 — Files to edit:**
+- `src/App.tsx` — add new routes
+- `src/components/landing/Navbar.tsx` — new nav links + primary CTA
+- `src/components/landing/HeroSection.tsx` — updated headline, trust chips, demo CTA
+- `src/components/landing/Footer.tsx` — new links
+- `index.html` — Organization JSON-LD
 
-**Database changes:** One `app_config` row update to add Phase 4 toggle defaults — done via migration.
+**No DB migrations needed for Phases 1-2.** Phase 4 requires new tables.
+
+---
+
+### Recommendation
+
+Start with **Phase 1** (guardrail fixes) as it addresses the most critical security and privacy violations. This is the smallest phase (~6 files) but the most important. Phase 2 (marketing pages) can follow immediately after. Phases 3-4 are lower priority and can be deferred until after the guardrails and marketing pages are solid.
+
+Shall I proceed with Phase 1 first?
+
