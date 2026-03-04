@@ -48,6 +48,7 @@ beforeEach(() => {
     constructor(src?: string) {
       super();
       if (src) this.src = src;
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
       lastAudio = this;
       // Auto-fire loadedmetadata
       setTimeout(() => this.emit("loadedmetadata"), 0);
