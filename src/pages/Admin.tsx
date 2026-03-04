@@ -278,6 +278,136 @@ const Admin = () => {
     },
   });
 
+  // ═══ DROP MUTATIONS ═══
+
+  const createDropMutation = useMutation({
+    mutationFn: async (form: DropForm) => {
+      const { error } = await supabase.from("drops").insert({
+        title: form.title,
+        description: form.description || null,
+        room_id: form.room_id,
+        scheduled_at: form.scheduled_at,
+        duration_minutes: form.duration_minutes,
+        max_capacity: form.max_capacity,
+        region: form.region,
+        timezone: form.timezone,
+        is_friendfluence: form.is_friendfluence,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-drops"] });
+      setDropFormOpen(false);
+      setDropForm(emptyDropForm);
+      toast.success("Drop created");
+    },
+    onError: () => toast.error("Failed to create drop"),
+  });
+
+  const updateDropMutation = useMutation({
+    mutationFn: async ({ id, form }: { id: string; form: DropForm }) => {
+      const { error } = await supabase.from("drops").update({
+        title: form.title,
+        description: form.description || null,
+        room_id: form.room_id,
+        scheduled_at: form.scheduled_at,
+        duration_minutes: form.duration_minutes,
+        max_capacity: form.max_capacity,
+        region: form.region,
+        timezone: form.timezone,
+        is_friendfluence: form.is_friendfluence,
+      }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-drops"] });
+      setEditingDrop(null);
+      setDropForm(emptyDropForm);
+      toast.success("Drop updated");
+    },
+    onError: () => toast.error("Failed to update drop"),
+  });
+
+  const deleteDropMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("drops").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-drops"] });
+      toast.success("Drop deleted");
+    },
+    onError: () => toast.error("Failed to delete drop"),
+  });
+
+  const openEditDrop = (drop: typeof adminDrops[0]) => {
+    setEditingDrop(drop);
+    setDropForm({
+      title: drop.title,
+      description: drop.description || "",
+      room_id: drop.room_id,
+      scheduled_at: drop.scheduled_at.slice(0, 16),
+      duration_minutes: drop.duration_minutes,
+      max_capacity: drop.max_capacity,
+      region: drop.region,
+      timezone: drop.timezone,
+      is_friendfluence: drop.is_friendfluence,
+    });
+  };
+
+  const DropFormFields = () => (
+    <div className="space-y-4">
+      <div>
+        <Label className="text-xs">Title</Label>
+        <Input value={dropForm.title} onChange={(e) => setDropForm((f) => ({ ...f, title: e.target.value }))} placeholder="Friday Night Drop" />
+      </div>
+      <div>
+        <Label className="text-xs">Description</Label>
+        <Textarea value={dropForm.description} onChange={(e) => setDropForm((f) => ({ ...f, description: e.target.value }))} placeholder="Optional description" rows={2} />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label className="text-xs">Room</Label>
+          <Select value={dropForm.room_id} onValueChange={(v) => setDropForm((f) => ({ ...f, room_id: v }))}>
+            <SelectTrigger><SelectValue placeholder="Select room" /></SelectTrigger>
+            <SelectContent>
+              {rooms.map((r) => <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label className="text-xs">Scheduled at</Label>
+          <Input type="datetime-local" value={dropForm.scheduled_at} onChange={(e) => setDropForm((f) => ({ ...f, scheduled_at: e.target.value }))} />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div>
+          <Label className="text-xs">Duration (min)</Label>
+          <Input type="number" value={dropForm.duration_minutes} onChange={(e) => setDropForm((f) => ({ ...f, duration_minutes: Number(e.target.value) }))} />
+        </div>
+        <div>
+          <Label className="text-xs">Max capacity</Label>
+          <Input type="number" value={dropForm.max_capacity} onChange={(e) => setDropForm((f) => ({ ...f, max_capacity: Number(e.target.value) }))} />
+        </div>
+        <div>
+          <Label className="text-xs">Region</Label>
+          <Select value={dropForm.region} onValueChange={(v) => setDropForm((f) => ({ ...f, region: v }))}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {["AU", "NZ", "US", "UK"].map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="flex items-center gap-3">
+        <Switch checked={dropForm.is_friendfluence} onCheckedChange={(v) => setDropForm((f) => ({ ...f, is_friendfluence: v }))} />
+        <Label className="text-xs">Friendfluence (bring a friend)</Label>
+      </div>
+    </div>
+  );
+
+  const genderBalance = platformStats?.gender_balance as { men?: number; women?: number; nonbinary?: number } | null;
+
   const { data: rooms = [] } = useQuery({
     queryKey: ["admin-rooms"],
     queryFn: async () => {
