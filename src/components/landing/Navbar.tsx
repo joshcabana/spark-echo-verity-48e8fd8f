@@ -38,7 +38,7 @@ const Navbar = () => {
         <VerityLogo className="h-7 w-auto" linkTo="/" />
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link
               key={link.to}
@@ -64,7 +64,7 @@ const Navbar = () => {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+          className="lg:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
         >
@@ -80,7 +80,7 @@ const Navbar = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 overflow-hidden"
+            className="lg:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 overflow-hidden"
           >
             <div className="container max-w-6xl mx-auto px-6 py-4 flex flex-col gap-3">
               {navLinks.map((link) => (

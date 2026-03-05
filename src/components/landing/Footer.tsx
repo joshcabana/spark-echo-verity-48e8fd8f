@@ -35,7 +35,7 @@ const Footer = () => {
               </Link>
             ))}
             <Link
-              to="/auth"
+              to="/onboarding"
               className="hover:text-primary transition-colors"
             >
               Get verified

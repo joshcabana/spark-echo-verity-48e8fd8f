@@ -208,7 +208,10 @@ const Auth = () => {
 
       <div className="p-6 text-center">
         <p className="text-xs text-muted-foreground/40">
-          By continuing, you agree to Verity's terms of service and privacy policy.
+          By continuing, you agree to Verity's{" "}
+          <Link to="/terms" className="underline hover:text-muted-foreground transition-colors">terms of service</Link>
+          {" "}and{" "}
+          <Link to="/privacy" className="underline hover:text-muted-foreground transition-colors">privacy policy</Link>.
         </p>
       </div>
     </div>
