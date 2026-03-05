@@ -14,17 +14,6 @@ const ALLOWED_ORIGINS = [
 ];
 
 // Allowlisted price IDs → mode mapping
-// ─── PRODUCTION TODO ───────────────────────────────────────────────────
-// Replace each placeholder key below with the real Stripe Price ID from
-// your Stripe Dashboard → Products → select product → copy Price ID.
-// Real IDs look like: "price_1Abc123DefGhi456"  (starts with "price_")
-//
-//   "price_starter_10"   → 10-token one-time pack
-//   "price_popular_15"   → 15-token one-time pack (most popular)
-//   "price_value_30"     → 30-token one-time pack (best value)
-//   "price_pass_monthly" → Monthly subscription pass
-//   "price_pass_annual"  → Annual subscription pass
-// ────────────────────────────────────────────────────────────────────────
 const PRICE_MAP: Record<string, { mode: "payment" | "subscription" }> = {
   "price_1T6rXLC1O032lUHcL3kvvio4": { mode: "payment" },
   "price_1T6rYJC1O032lUHc3fO3j6R6": { mode: "payment" },

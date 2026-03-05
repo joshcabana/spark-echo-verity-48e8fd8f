@@ -3,17 +3,6 @@ import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // Price ID → entitlement map (must match create-checkout PRICE_MAP)
-// ─── PRODUCTION TODO ───────────────────────────────────────────────────
-// Replace each placeholder key below with the SAME real Stripe Price IDs
-// used in create-checkout/index.ts. They must match exactly.
-// Real IDs look like: "price_1Abc123DefGhi456"  (starts with "price_")
-//
-//   "price_starter_10"   → grants 10 tokens on purchase
-//   "price_popular_15"   → grants 15 tokens on purchase
-//   "price_value_30"     → grants 30 tokens on purchase
-//   "price_pass_monthly" → activates "pass_monthly" subscription tier
-//   "price_pass_annual"  → activates "pass_annual" subscription tier
-// ────────────────────────────────────────────────────────────────────────
 const PRICE_ENTITLEMENTS: Record<string, { tokens?: number; tier?: string; annual?: boolean }> = {
   "price_1T6rXLC1O032lUHcL3kvvio4": { tokens: 10 },
   "price_1T6rYJC1O032lUHc3fO3j6R6": { tokens: 15 },
