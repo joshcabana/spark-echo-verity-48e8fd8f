@@ -108,6 +108,15 @@ const Transparency = () => {
         <title>Transparency — Verity | Radical Openness</title>
         <meta name="description" content="Verity's live transparency report: platform stats, safety metrics, AI accuracy, and gender balance — published in real time." />
         <link rel="canonical" href="https://getverity.com.au/transparency" />
+        <meta property="og:title" content="Transparency — Verity | Radical Openness" />
+        <meta property="og:description" content="Verity's live transparency report: platform stats, safety metrics, AI accuracy, and gender balance — published in real time." />
+        <meta property="og:url" content="https://getverity.com.au/transparency" />
+        <meta property="og:image" content="https://getverity.com.au/og-logo.png" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Transparency — Verity | Radical Openness" />
+        <meta name="twitter:description" content="Verity's live transparency report: platform stats, safety metrics, AI accuracy, and gender balance — published in real time." />
+        <meta name="twitter:image" content="https://getverity.com.au/og-logo.png" />
       </Helmet>
       <Navbar />
 
