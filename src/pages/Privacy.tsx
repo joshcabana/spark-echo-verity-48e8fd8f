@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Shield } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
