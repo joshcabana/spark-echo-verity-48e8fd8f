@@ -53,6 +53,15 @@ const Pricing = () => {
           content="Verity is free to use. Upgrade to Verity Pass for Spark Reflection AI, Chemistry Vault, priority RSVP, and premium rooms. Cancel anytime."
         />
         <link rel="canonical" href="https://getverity.com.au/pricing" />
+        <meta property="og:title" content="Pricing — Verity | Free & Verity Pass Plans" />
+        <meta property="og:description" content="Verity is free to use. Upgrade to Verity Pass for Spark Reflection AI, Chemistry Vault, priority RSVP, and premium rooms. Cancel anytime." />
+        <meta property="og:url" content="https://getverity.com.au/pricing" />
+        <meta property="og:image" content="https://getverity.com.au/og-logo.png" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Pricing — Verity | Free & Verity Pass Plans" />
+        <meta name="twitter:description" content="Verity is free to use. Upgrade to Verity Pass for Spark Reflection AI, Chemistry Vault, priority RSVP, and premium rooms." />
+        <meta name="twitter:image" content="https://getverity.com.au/og-logo.png" />
       </Helmet>
 
       <Navbar />

@@ -70,6 +70,15 @@ const Safety = () => {
           content="Verity's safety promise: no recordings, mutual consent reveal, 18+ verification, AI moderation, one-tap exit, and zero tolerance for abuse."
         />
         <link rel="canonical" href="https://getverity.com.au/safety" />
+        <meta property="og:title" content="Safety Promise — Verity | Built for Safety, Not Virality" />
+        <meta property="og:description" content="Verity's safety promise: no recordings, mutual consent reveal, 18+ verification, AI moderation, one-tap exit, and zero tolerance for abuse." />
+        <meta property="og:url" content="https://getverity.com.au/safety" />
+        <meta property="og:image" content="https://getverity.com.au/og-logo.png" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Safety Promise — Verity | Built for Safety, Not Virality" />
+        <meta name="twitter:description" content="Verity's safety promise: no recordings, mutual consent reveal, 18+ verification, AI moderation, one-tap exit, and zero tolerance for abuse." />
+        <meta name="twitter:image" content="https://getverity.com.au/og-logo.png" />
       </Helmet>
 
       <Navbar />

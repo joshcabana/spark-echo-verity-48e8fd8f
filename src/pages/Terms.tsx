@@ -67,6 +67,15 @@ const Terms = () => {
           content="Verity's terms of service. Eligibility, acceptable use, privacy, payments, and governing law for Australia's verified anonymous speed dating platform."
         />
         <link rel="canonical" href="https://getverity.com.au/terms" />
+        <meta property="og:title" content="Terms of Service — Verity" />
+        <meta property="og:description" content="Verity's terms of service. Eligibility, acceptable use, privacy, payments, and governing law for Australia's verified anonymous speed dating platform." />
+        <meta property="og:url" content="https://getverity.com.au/terms" />
+        <meta property="og:image" content="https://getverity.com.au/og-logo.png" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Terms of Service — Verity" />
+        <meta name="twitter:description" content="Verity's terms of service. Eligibility, acceptable use, privacy, payments, and governing law." />
+        <meta name="twitter:image" content="https://getverity.com.au/og-logo.png" />
       </Helmet>
 
       <Navbar />

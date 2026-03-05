@@ -18,6 +18,15 @@ const Drops = () => {
           content="Browse Verity's themed Drop schedule. Night Owls, Tech Professionals, Creatives, Over 35, and more. RSVP for your next anonymous speed date."
         />
         <link rel="canonical" href="https://getverity.com.au/drops" />
+        <meta property="og:title" content="Drops Schedule — Verity | Themed Speed Dating Events" />
+        <meta property="og:description" content="Browse Verity's themed Drop schedule. Night Owls, Tech Professionals, Creatives, Over 35, and more. RSVP for your next anonymous speed date." />
+        <meta property="og:url" content="https://getverity.com.au/drops" />
+        <meta property="og:image" content="https://getverity.com.au/og-logo.png" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Drops Schedule — Verity | Themed Speed Dating Events" />
+        <meta name="twitter:description" content="Browse Verity's themed Drop schedule. Night Owls, Tech Professionals, Creatives, Over 35, and more." />
+        <meta name="twitter:image" content="https://getverity.com.au/og-logo.png" />
       </Helmet>
 
       <Navbar />

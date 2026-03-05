@@ -51,6 +51,15 @@ const HowItWorks = () => {
           content="Four steps to real chemistry. RSVP to a themed Drop, join a 45-second anonymous video call, choose Spark or Pass, and connect if it's mutual."
         />
         <link rel="canonical" href="https://getverity.com.au/how-it-works" />
+        <meta property="og:title" content="How It Works — Verity | Anonymous Speed Dating" />
+        <meta property="og:description" content="Four steps to real chemistry. RSVP to a themed Drop, join a 45-second anonymous video call, choose Spark or Pass, and connect if it's mutual." />
+        <meta property="og:url" content="https://getverity.com.au/how-it-works" />
+        <meta property="og:image" content="https://getverity.com.au/og-logo.png" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="How It Works — Verity | Anonymous Speed Dating" />
+        <meta name="twitter:description" content="Four steps to real chemistry. RSVP to a themed Drop, join a 45-second anonymous video call, choose Spark or Pass, and connect if it's mutual." />
+        <meta name="twitter:image" content="https://getverity.com.au/og-logo.png" />
       </Helmet>
 
       <Navbar />

@@ -12,6 +12,15 @@ const About = () => {
         <title>About — Verity | Built in Australia</title>
         <meta name="description" content="Verity is built by a solo Australian developer. No venture capital, no dark patterns — just a genuine attempt to fix how people meet." />
         <link rel="canonical" href="https://getverity.com.au/about" />
+        <meta property="og:title" content="About — Verity | Built in Australia" />
+        <meta property="og:description" content="Verity is built by a solo Australian developer. No venture capital, no dark patterns — just a genuine attempt to fix how people meet." />
+        <meta property="og:url" content="https://getverity.com.au/about" />
+        <meta property="og:image" content="https://getverity.com.au/og-logo.png" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="About — Verity | Built in Australia" />
+        <meta name="twitter:description" content="Verity is built by a solo Australian developer. No venture capital, no dark patterns — just a genuine attempt to fix how people meet." />
+        <meta name="twitter:image" content="https://getverity.com.au/og-logo.png" />
       </Helmet>
       <Navbar />
 

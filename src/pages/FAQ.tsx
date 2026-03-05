@@ -72,6 +72,15 @@ const FAQ = () => {
           content="Frequently asked questions about Verity's anonymous speed dating: privacy, Spark mechanics, verification, recordings, data, and safety."
         />
         <link rel="canonical" href="https://getverity.com.au/faq" />
+        <meta property="og:title" content="FAQ — Verity | Your Questions Answered" />
+        <meta property="og:description" content="Frequently asked questions about Verity's anonymous speed dating: privacy, Spark mechanics, verification, recordings, data, and safety." />
+        <meta property="og:url" content="https://getverity.com.au/faq" />
+        <meta property="og:image" content="https://getverity.com.au/og-logo.png" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="FAQ — Verity | Your Questions Answered" />
+        <meta name="twitter:description" content="Frequently asked questions about Verity's anonymous speed dating: privacy, Spark mechanics, verification, recordings, data, and safety." />
+        <meta name="twitter:image" content="https://getverity.com.au/og-logo.png" />
         <script type="application/ld+json">
           {JSON.stringify(faqSchema)}
         </script>

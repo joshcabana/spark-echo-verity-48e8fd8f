@@ -16,6 +16,15 @@ const Landing = () => {
         <title>Verity — Real Chemistry in 45 Seconds</title>
         <meta name="description" content="Verified 18+ anonymous speed dating. Real chemistry in 45 seconds. Mutual spark only. Dignity always." />
         <link rel="canonical" href="https://getverity.com.au" />
+        <meta property="og:title" content="Verity — Real Chemistry in 45 Seconds" />
+        <meta property="og:description" content="Verified 18+ anonymous speed dating. Real chemistry in 45 seconds. Mutual spark only. Dignity always." />
+        <meta property="og:url" content="https://getverity.com.au" />
+        <meta property="og:image" content="https://getverity.com.au/og-logo.png" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Verity — Real Chemistry in 45 Seconds" />
+        <meta name="twitter:description" content="Verified 18+ anonymous speed dating. Real chemistry in 45 seconds. Mutual spark only. Dignity always." />
+        <meta name="twitter:image" content="https://getverity.com.au/og-logo.png" />
       </Helmet>
       <Navbar />
       <HeroSection />

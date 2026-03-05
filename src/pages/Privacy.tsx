@@ -39,6 +39,15 @@ const Privacy = () => {
         <title>Privacy Policy — Verity</title>
         <meta name="description" content="Verity's privacy policy. What data we collect, how we use it, your rights, and how to contact us. Your privacy is foundational." />
         <link rel="canonical" href="https://getverity.com.au/privacy" />
+        <meta property="og:title" content="Privacy Policy — Verity" />
+        <meta property="og:description" content="Verity's privacy policy. What data we collect, how we use it, your rights, and how to contact us. Your privacy is foundational." />
+        <meta property="og:url" content="https://getverity.com.au/privacy" />
+        <meta property="og:image" content="https://getverity.com.au/og-logo.png" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Privacy Policy — Verity" />
+        <meta name="twitter:description" content="Verity's privacy policy. What data we collect, how we use it, your rights, and how to contact us." />
+        <meta name="twitter:image" content="https://getverity.com.au/og-logo.png" />
       </Helmet>
       <Navbar />
 
