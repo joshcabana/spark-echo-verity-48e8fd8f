@@ -12,6 +12,10 @@ export default defineConfig({
       "src/**/*.{test,spec}.{ts,tsx}",
       "supabase/functions/**/*.{test,spec}.{ts,tsx}",
     ],
+    exclude: [
+      "node_modules/**",
+      "supabase/functions/**/index.test.ts",
+    ],
   },
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
