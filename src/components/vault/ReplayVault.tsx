@@ -18,6 +18,11 @@ interface VaultItem {
   partner_name: string;
 }
 
+interface ReflectionEntry {
+  ai_reflection: string | null;
+  feeling_score: number | null;
+}
+
 const ReplayVault = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
@@ -35,28 +40,28 @@ const ReplayVault = () => {
 
       // Query vault items with reflection data
       const { data, error } = await supabase
-        .from("chemistry_vault_items" as any)
+        .from("chemistry_vault_items")
         .select("id, call_id, title, user_notes, reflection_id, partner_user_id, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      const items = (data || []) as any[];
+      const items = data || [];
 
       // Get reflection data for items that have one
       const reflectionIds = items
-        .map((i: any) => i.reflection_id)
-        .filter(Boolean);
+        .map((i) => i.reflection_id)
+        .filter(Boolean) as string[];
 
-      let reflectionMap: Record<string, { ai_reflection: string | null; feeling_score: number | null }> = {};
+      const reflectionMap: Record<string, ReflectionEntry> = {};
       if (reflectionIds.length > 0) {
         const { data: reflections } = await supabase
-          .from("spark_reflections" as any)
+          .from("spark_reflections")
           .select("id, ai_reflection, feeling_score")
           .in("id", reflectionIds);
 
         if (reflections) {
-          (reflections as any[]).forEach((r: any) => {
+          reflections.forEach((r) => {
             reflectionMap[r.id] = {
               ai_reflection: r.ai_reflection,
               feeling_score: r.feeling_score,
@@ -66,25 +71,25 @@ const ReplayVault = () => {
       }
 
       // Fetch partner names
-      const partnerIds = [...new Set(items.map((i: any) => i.partner_user_id))];
+      const partnerIds = [...new Set(items.map((i) => i.partner_user_id))];
       const profileMap: Record<string, string> = {};
 
       if (partnerIds.length > 0) {
         const results = await Promise.all(
-          partnerIds.map((uid: string) =>
+          partnerIds.map((uid) =>
             supabase.rpc("get_spark_partner_profile", { _partner_user_id: uid })
           )
         );
         results.forEach(({ data: profiles }) => {
           if (profiles) {
-            profiles.forEach((p: { user_id: string; display_name: string | null }) => {
+            profiles.forEach((p) => {
               profileMap[p.user_id] = p.display_name?.split(" ")[0] || "Spark";
             });
           }
         });
       }
 
-      return items.map((item: any) => {
+      return items.map((item) => {
         const ref = item.reflection_id ? reflectionMap[item.reflection_id] : null;
         return {
           id: item.id,
