@@ -8,6 +8,7 @@ import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import ScrollToTop from "@/components/ScrollToTop";
 import AppHeader from "@/components/AppHeader";
 import PushNotificationManager from "@/components/PushNotificationManager";
 import { lazy, Suspense } from "react";
@@ -65,6 +66,7 @@ const App = () => (
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <AuthProvider>
               <ErrorBoundary>
+                <ScrollToTop />
                 <AppHeader />
                 <PushNotificationManager />
                 <Suspense fallback={<LazyFallback />}>

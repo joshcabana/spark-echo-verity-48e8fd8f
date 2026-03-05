@@ -25,7 +25,7 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background" />
       </div>
 
-      <div className="relative z-10 container max-w-4xl mx-auto px-6 text-center">
+      <div className="relative z-10 container max-w-4xl mx-auto px-6 pt-20 text-center">
         {/* Trust chips */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
