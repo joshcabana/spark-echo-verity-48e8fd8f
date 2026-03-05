@@ -35,6 +35,11 @@ const sections = [
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Privacy Policy — Verity</title>
+        <meta name="description" content="Verity's privacy policy. What data we collect, how we use it, your rights, and how to contact us. Your privacy is foundational." />
+        <link rel="canonical" href="https://getverity.com.au/privacy" />
+      </Helmet>
       <Navbar />
 
       <main className="pt-24 pb-16">

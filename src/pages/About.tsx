@@ -8,6 +8,11 @@ import Footer from "@/components/landing/Footer";
 const About = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>About — Verity | Built in Australia</title>
+        <meta name="description" content="Verity is built by a solo Australian developer. No venture capital, no dark patterns — just a genuine attempt to fix how people meet." />
+        <link rel="canonical" href="https://getverity.com.au/about" />
+      </Helmet>
       <Navbar />
 
       <main className="pt-24 pb-16">

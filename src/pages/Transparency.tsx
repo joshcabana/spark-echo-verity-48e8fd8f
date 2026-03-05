@@ -104,6 +104,11 @@ const Transparency = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Transparency — Verity | Radical Openness</title>
+        <meta name="description" content="Verity's live transparency report: platform stats, safety metrics, AI accuracy, and gender balance — published in real time." />
+        <link rel="canonical" href="https://getverity.com.au/transparency" />
+      </Helmet>
       <Navbar />
 
       <main className="pt-24 pb-16">
