@@ -91,6 +91,7 @@ const App = () => (
                     <Route path="/pricing" element={<Pricing />} />
                     <Route path="/lander" element={<Navigate to="/" replace />} />
                     <Route path="/sign-in" element={<Navigate to="/auth" replace />} />
+                    <Route path="/sign-in" element={<Navigate to="/auth" replace />} />
                     <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                     <Route path="/appeal" element={<ProtectedRoute><Appeal /></ProtectedRoute>} />
                     <Route path="/appeal/:flagId" element={<ProtectedRoute><Appeal /></ProtectedRoute>} />
